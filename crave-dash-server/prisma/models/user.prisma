@@ -1,0 +1,25 @@
+model User {
+    id           String     @id @default(uuid())
+    email        String     @unique
+    password     String
+    role         Role       @default(CUSTOMER)
+    status       UserStatus @default(ACTIVE)
+    createdAt    DateTime   @default(now())
+    updatedAt    DateTime   @updatedAt
+
+    customer Customer?
+
+    @@map("users")
+}
+
+enum Role {
+    CUSTOMER
+    PROVIDER
+    ADMIN
+}
+
+enum UserStatus {
+    ACTIVE
+    SUSPENDED
+    PENDING
+}
