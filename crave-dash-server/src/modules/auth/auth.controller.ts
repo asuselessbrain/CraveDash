@@ -6,9 +6,10 @@ import { config } from "../../config";
 const cookieOptions = {
     httpOnly: true,
     secure: config.nodeEnv === "production",
-    sameSite: "strict" as const,
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-}
+    sameSite: config.nodeEnv === "production" ? "none" as const : "lax" as const,
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    path: "/"
+};
 
 const login = catchAsync(async(req: Request, res: Response) =>{
     const result = await AuthService.loginUser(req.body);

@@ -151,10 +151,11 @@ var AuthService = {
 // src/modules/auth/auth.controller.ts
 var cookieOptions = {
   httpOnly: true,
-  secure: config2.nodeEnv === "production",
-  sameSite: "strict",
-  maxAge: 30 * 24 * 60 * 60 * 1e3
-  // 30 days
+  secure: true,
+  sameSite: config2.nodeEnv === "production" ? "none" : "lax",
+  maxAge: 30 * 24 * 60 * 60 * 1e3,
+  path: "/",
+  partitioned: true
 };
 var login = catchAsync(async (req, res) => {
   const result = await AuthService.loginUser(req.body);
@@ -292,7 +293,7 @@ app.use(express4.json());
 app.use(express4.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "*",
+    origin: ["http://localhost:3000", "https://cravedash.vercel.app"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],

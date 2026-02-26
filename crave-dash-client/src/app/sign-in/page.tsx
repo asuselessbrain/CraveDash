@@ -1,8 +1,11 @@
-import { Button } from '@/components/ui/button'
-import React from 'react'
+import { SignInForm } from "@/components/modules/signIn/SignInForm";
 
 export default function SignInPage() {
   return (
-    <div><Button>Click </Button></div>
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <SignInForm />
+      </div>
+    </div>
   )
 }
