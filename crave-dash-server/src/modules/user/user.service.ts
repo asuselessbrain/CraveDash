@@ -3,6 +3,8 @@ import { prisma } from "../../lib/prisma";
 import bcrypt from "bcrypt";
 import { CustomerInput } from "./customerValidationSchema";
 import { Role } from "../../../generated/prisma/enums";
+import jwt from "jsonwebtoken";
+import { StringValue } from "ms";
 
 const createCustomer = async (data: CustomerInput) => {
   const hashedPassword = await bcrypt.hash(
@@ -33,7 +35,14 @@ const createCustomer = async (data: CustomerInput) => {
     });
     return customer;
   });
-  return result;
+
+  const token = jwt.sign(
+      { email: customerData.email, role: useData.role },
+      String(config.jwt.secret),
+      { expiresIn: config.jwt.expiresIn as StringValue },
+    );
+
+  return { ...result, token };
 };
 
 export const UserService = {

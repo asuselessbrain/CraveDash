@@ -20,6 +20,10 @@ import { Controller, FieldValues, useForm } from "react-hook-form";
 import { loginValidationSchema } from "./LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signInUser } from "@/services/auth";
+import Link from "next/link";
+import { ChefHat } from "lucide-react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export function SignInForm({
   className,
@@ -29,21 +33,41 @@ export function SignInForm({
     resolver: zodResolver(loginValidationSchema),
   });
 
-  const handleSignIn = async(data: FieldValues) =>{
+  const { formState: { isSubmitting } } = form;
+
+  const router = useRouter()
+
+  const handleSignIn = async (data: FieldValues) => {
     const res = await signInUser(data)
-    console.log(res)
+    if (res.success) {
+      router.push("/")
+      toast.success(res.message || "Signed in successfully!")
+    }
+    else {
+      toast.error(res.errorMessage || "Failed to sign in. Please check your credentials and try again.")
+    }
   }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
+      {/* Logo */}
+      <div className="flex justify-center mb-8">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+            <ChefHat className="h-6 w-6 text-primary-foreground" />
+          </div>
+          <span className="text-2xl font-bold text-foreground">FoodHub</span>
+        </Link>
+      </div>
+
+      <Card className="border-0 shadow-lg">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Welcome Back</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Sign in to your account to continue
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={form.handleSubmit(handleSignIn)}>
+          <form onSubmit={form.handleSubmit(handleSignIn)} className="space-y-4">
             <FieldGroup>
               <Controller
                 name="email"
@@ -95,15 +119,25 @@ export function SignInForm({
                 )}
               />
               <Field>
-                <Button type="submit">Login</Button>
+                {
+                  isSubmitting ? <Button type="button" disabled>Loading....</Button> : <Button type="submit">Login</Button>
+                }
+
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="#">Sign up</a>
+                  Don&apos;t have an account? <Link href="/sign-up" className="underline hover:text-foreground">Sign Up</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
           </form>
         </CardContent>
       </Card>
+
+      <p className="mt-8 text-center text-xs text-muted-foreground">
+        By signing in, you agree to our{' '}
+        <Link href="/terms" className="underline hover:text-foreground">Terms of Service</Link>
+        {' '}and{' '}
+        <Link href="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>
+      </p>
     </div>
   );
 }

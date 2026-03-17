@@ -3,7 +3,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import { AuthService } from "./auth.service";
 import { config } from "../../config";
 
-const cookieOptions = {
+export const cookieOptions = {
     httpOnly: true,
     secure: config.nodeEnv === "production",
     sameSite: config.nodeEnv === "production" ? "none" as const : "lax" as const,
@@ -21,7 +21,9 @@ const login = catchAsync(async(req: Request, res: Response) =>{
     res.status(200).json({
         success: true,
         message: "User logged in successfully",
-        data: userData,
+        data: {
+            token, userData
+        },
     })
 })
 
