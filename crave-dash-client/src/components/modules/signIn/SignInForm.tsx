@@ -24,6 +24,8 @@ import Link from "next/link";
 import { ChefHat } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import ForgotPassword from "../ForgetPassword/ForgotPassword";
 
 export function SignInForm({
   className,
@@ -96,12 +98,17 @@ export function SignInForm({
                   <Field>
                     <div className="flex items-center">
                       <FieldLabel htmlFor="password">Password</FieldLabel>
-                      <a
-                        href="#"
-                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                      >
-                        Forgot your password?
-                      </a>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <button
+                            type="button"
+                            className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                          >
+                            Forgot your password?
+                          </button>
+                        </DialogTrigger>
+                        <ForgotPassword />
+                      </Dialog>
                     </div>
                     <Input
                       {...field}

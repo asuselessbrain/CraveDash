@@ -60,3 +60,24 @@ export const signUpUser = async (data: FieldValues) => {
   }
 }
 
+export const forgotPassword = async (email: FieldValues) =>{
+  try{
+    const res = await fetch(
+      "http://localhost:5000/api/v1/auth/forgot-password",
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(email),
+      }
+    );
+    const result = await res.json();
+    console.log(result)
+    return result;
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    throw error;
+  }
+}
+

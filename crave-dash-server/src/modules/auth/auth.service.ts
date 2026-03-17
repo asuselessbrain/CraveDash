@@ -53,7 +53,7 @@ const forgetPassword = async (payload: { email: string }) => {
   const token = jwt.sign(
     { email: isUserExist.email, role: isUserExist.role },
     String(config.jwt.secret),
-    { expiresIn: config.jwt.expiresIn as StringValue },
+    { expiresIn: config.email.email_expires_in as StringValue },
   );
 
   const url = `${config.clientUrl}/reset-password?token=${token}`;
