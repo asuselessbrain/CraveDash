@@ -3,11 +3,11 @@ import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
 
 const cookieOptions = {
-        httpOnly: true,
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-  } as const
+  httpOnly: true,
+  expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
+} as const
 
 export const signInUser = async (data: FieldValues) => {
   const cookieStore = await cookies()
@@ -49,7 +49,7 @@ export const signUpUser = async (data: FieldValues) => {
     );
     const result = await res.json();
 
-    if(result.success) {
+    if (result.success) {
       cookieStore.set("token", result.data.token, cookieOptions)
     }
     return result;
@@ -60,8 +60,8 @@ export const signUpUser = async (data: FieldValues) => {
   }
 }
 
-export const forgotPassword = async (email: FieldValues) =>{
-  try{
+export const forgotPassword = async (email: FieldValues) => {
+  try {
     const res = await fetch(
       "http://localhost:5000/api/v1/auth/forgot-password",
       {
@@ -81,3 +81,22 @@ export const forgotPassword = async (email: FieldValues) =>{
   }
 }
 
+export const resetPassword = async (data: FieldValues) => {
+  try {
+    const res = await fetch(
+      "http://localhost:5000/api/v1/auth/reset-password",
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
+    const result = await res.json();
+    return result;
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    throw error;
+  }
+}

@@ -85,6 +85,8 @@ const resetPassword = async (payload: { token: string; newPassword: string }) =>
     Number(config.saltRounds),
   );
 
+  console.log(hashedPassword)
+
   await prisma.user.update({
     where: {
       email: decoded.email,
