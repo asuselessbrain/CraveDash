@@ -93,8 +93,7 @@ const Navbar = () => {
 
       {/* Navbar */}
       <div className="fixed top-0 left-0 right-0 z-40 px-6 py-4 backdrop-blur-md
-        bg-white/80 dark:bg-gray-900/80
-        shadow-md dark:shadow-black/40">
+        bg-white/80 dark:bg-gray-900/80 shadow-md dark:shadow-black/40">
         <nav
           className="flex w-full items-center justify-between max-w-7xl mx-auto"
         >

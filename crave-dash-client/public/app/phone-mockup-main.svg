@@ -1,0 +1,24 @@
+<svg width="420" height="860" viewBox="0 0 420 860" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="frame" x1="0" y1="0" x2="420" y2="860">
+      <stop stop-color="#111827"/>
+      <stop offset="1" stop-color="#374151"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="360" y2="760">
+      <stop stop-color="#f97316"/>
+      <stop offset="0.55" stop-color="#fb923c"/>
+      <stop offset="1" stop-color="#fdba74"/>
+    </linearGradient>
+  </defs>
+  <rect width="420" height="860" rx="54" fill="url(#frame)"/>
+  <rect x="30" y="30" width="360" height="800" rx="38" fill="url(#screen)"/>
+  <rect x="144" y="50" width="132" height="22" rx="11" fill="#111827" fill-opacity="0.65"/>
+  <rect x="58" y="106" width="304" height="84" rx="22" fill="#fff" fill-opacity="0.24"/>
+  <rect x="58" y="214" width="144" height="130" rx="18" fill="#fff" fill-opacity="0.22"/>
+  <rect x="218" y="214" width="144" height="130" rx="18" fill="#fff" fill-opacity="0.22"/>
+  <rect x="58" y="368" width="304" height="120" rx="22" fill="#fff" fill-opacity="0.22"/>
+  <rect x="58" y="512" width="304" height="120" rx="22" fill="#fff" fill-opacity="0.22"/>
+  <rect x="58" y="656" width="304" height="120" rx="22" fill="#111827" fill-opacity="0.18"/>
+  <text x="82" y="160" fill="#fff" font-size="32" font-family="Arial" font-weight="700">CraveDash App</text>
+  <text x="82" y="720" fill="#fff" font-size="26" font-family="Arial" font-weight="700">Fast Checkout</text>
+</svg>

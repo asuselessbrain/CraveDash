@@ -1,0 +1,13 @@
+<svg width="320" height="200" viewBox="0 0 320 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="320" y2="200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B91C1C"/>
+      <stop offset="1" stop-color="#F97316"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="200" rx="24" fill="url(#bg)"/>
+  <circle cx="80" cy="52" r="36" fill="#FFFFFF" fill-opacity="0.22"/>
+  <circle cx="266" cy="158" r="52" fill="#FFFFFF" fill-opacity="0.14"/>
+  <rect x="28" y="130" width="264" height="42" rx="16" fill="#000000" fill-opacity="0.2"/>
+  <text x="42" y="157" fill="#fff" font-size="28" font-family="Arial" font-weight="700">BBQ</text>
+</svg>
