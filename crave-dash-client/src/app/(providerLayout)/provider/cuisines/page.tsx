@@ -1,5 +1,7 @@
-import Image from "next/image";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+"use client";
+
+import { Plus } from "lucide-react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
@@ -8,7 +10,7 @@ import CuisineForm from "@/components/modules/Provider/Cuisine/CuisineForm";
 
 
 export default function ProviderCuisinesPage() {
-    
+    const [isCuisineDialogOpen, setIsCuisineDialogOpen] = useState(false);
 
     return (
         <div className="space-y-6">
@@ -18,13 +20,13 @@ export default function ProviderCuisinesPage() {
                     <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">Cuisine Types</h1>
                 </div>
 
-                <Dialog>
+                <Dialog open={isCuisineDialogOpen} onOpenChange={setIsCuisineDialogOpen}>
                     <DialogTrigger asChild>
                         <Button className="h-11 rounded-xl bg-orange-500 text-white hover:bg-orange-400">
                             <Plus className="h-4 w-4" /> Add Cuisine
                         </Button>
                     </DialogTrigger>
-                    <CuisineForm />
+                    <CuisineForm onSuccess={() => setIsCuisineDialogOpen(false)} />
                 </Dialog>
             </header>
 

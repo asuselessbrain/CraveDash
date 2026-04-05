@@ -54,7 +54,6 @@ export type ProviderCuisine = {
     name: string;
     image: string;
     meals?: number;
-    status: ProviderCategoryStatus;
 };
 
 export const providerStats: ProviderDashboardStats = {
@@ -190,11 +189,11 @@ export const providerCategories: ProviderCategory[] = [
 ];
 
 export const providerCuisines: ProviderCuisine[] = [
-    { id: "cui-1", name: "Italian", image: "/cuisines/italian.svg", meals: 8, status: "Active" },
-    { id: "cui-2", name: "Chinese", image: "/cuisines/chinese.svg", meals: 10, status: "Active" },
-    { id: "cui-3", name: "Indian", image: "/cuisines/indian.svg", meals: 12, status: "Active" },
-    { id: "cui-4", name: "Mexican", image: "/cuisines/mexican.svg", meals: 6, status: "Active" },
-    { id: "cui-5", name: "Japanese", image: "/cuisines/japanese.svg", meals: 7, status: "Active" },
+    { id: "cui-1", name: "Italian", image: "/cuisines/italian.svg", meals: 8 },
+    { id: "cui-2", name: "Chinese", image: "/cuisines/chinese.svg", meals: 10 },
+    { id: "cui-3", name: "Indian", image: "/cuisines/indian.svg", meals: 12 },
+    { id: "cui-4", name: "Mexican", image: "/cuisines/mexican.svg", meals: 6 },
+    { id: "cui-5", name: "Japanese", image: "/cuisines/japanese.svg", meals: 7 },
 ];
 
 export const mealCategories = ["All", "Pizza", "Burger", "Biryani", "Dessert"] as const;

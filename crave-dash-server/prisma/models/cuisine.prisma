@@ -1,0 +1,15 @@
+model Cuisine {
+    id        String        @id @default(uuid())
+    name      String
+    image     String?
+    status    CuisineStatus @default(ACTIVE)
+    createdAt DateTime      @default(now())
+    updatedAt DateTime      @updatedAt
+
+    @@map("cuisines")
+}
+
+enum CuisineStatus {
+    ACTIVE
+    INACTIVE
+}

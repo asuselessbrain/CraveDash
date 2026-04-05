@@ -1,4 +1,5 @@
 import { AuthRoutes } from "../../modules/auth/auth.route";
+import { CuisineRoutes } from "../../modules/cuisine/cuisine.route";
 import { UserRoutes } from "../../modules/user/user.route";
 import express from "express";
 
@@ -12,6 +13,10 @@ const routes = [
   {
     path: "/auth",
     route: AuthRoutes
+  },
+  {
+    path: "/cuisine",
+    route: CuisineRoutes
   }
 ];
 
