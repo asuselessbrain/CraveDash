@@ -82,22 +82,23 @@ const loopedProviders = [...providers, ...providers];
 
 export default function TopRatedProvider() {
 	return (
-		<section className="mx-auto mt-14 max-w-7xl px-4 sm:px-6 lg:px-8">
-			<div className="mb-6 flex items-center justify-between gap-3">
-				<h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-100">
-					⭐ Top Rated Restaurants Near You
-				</h2>
-			</div>
+		<section className="mx-auto mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
+			<div className="overflow-hidden rounded-[2.25rem] border border-orange-200/70 bg-linear-to-br from-orange-50 via-amber-50 to-rose-50 p-6 shadow-lg shadow-orange-500/10 sm:p-8 lg:p-10 dark:border-orange-400/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+				<div className="mb-6 flex items-center justify-between gap-3">
+					<h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-100">
+						⭐ Top Rated Restaurants Near You
+					</h2>
+				</div>
 
-			<div className="group relative overflow-hidden pb-2">
-				<div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-14 bg-linear-to-r from-background to-transparent" />
-				<div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-14 bg-linear-to-l from-background to-transparent" />
+				<div className="group relative overflow-hidden pb-2">
+					<div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-14 bg-linear-to-r from-orange-50 to-transparent dark:from-slate-900" />
+					<div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-14 bg-linear-to-l from-rose-50 to-transparent dark:from-slate-800" />
 
-				<div className="provider-marquee-track group-hover:paused">
+					<div className="provider-marquee-track group-hover:paused">
 					{loopedProviders.map((provider, index) => (
 						<article
 							key={`${provider.slug}-${index}`}
-							className="w-70 shrink-0 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 dark:border-slate-700 dark:bg-slate-900/90"
+							className="w-70 shrink-0 rounded-2xl border border-white/80 bg-white/85 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 dark:border-slate-700 dark:bg-slate-900/85"
 						>
 							<div className="flex items-center gap-3">
 								<div className="relative h-12 w-12 overflow-hidden rounded-full border border-orange-100 bg-white">
@@ -138,10 +139,11 @@ export default function TopRatedProvider() {
 							</div>
 
 							<Button asChild className="mt-5 h-10 w-full rounded-xl bg-orange-500 font-semibold text-white hover:bg-orange-400">
-								<Link href={`/browse?restaurant=${provider.slug}`}>View Menu</Link>
+								<Link href={`/providers/${provider.slug}`}>View Menu</Link>
 							</Button>
 						</article>
 					))}
+					</div>
 				</div>
 			</div>
 		</section>

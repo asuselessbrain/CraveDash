@@ -100,12 +100,12 @@ export default function FlashDeals() {
   }, [dealDeadline]);
 
   return (
-    <section className="relative left-1/2 right-1/2 mt-14 w-screen -translate-x-1/2 bg-linear-to-r from-amber-50 via-orange-50 to-rose-50 py-10">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="overflow-hidden sm:p-7">
+    <section className="mx-auto mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="overflow-hidden rounded-[2.25rem] border border-orange-200/70 bg-linear-to-br from-orange-50 via-amber-50 to-rose-50 p-6 shadow-lg shadow-orange-500/10 sm:p-8 lg:p-10 dark:border-orange-400/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+        <div>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-100">
-              Flash Deals - Limited Time Only!
+              ⚡ Flash Deals - Limited Time Only!
             </h2>
 
             <div className="inline-flex items-center gap-2 rounded-full border border-orange-300/70 bg-white/85 px-3 py-2 text-sm font-semibold text-orange-700 backdrop-blur-sm dark:border-orange-500/40 dark:bg-slate-900/80 dark:text-orange-300">
@@ -120,7 +120,7 @@ export default function FlashDeals() {
             {flashDeals.map((deal) => (
               <article
                 key={deal.id}
-                className="group relative overflow-hidden rounded-2xl border border-orange-100/80 bg-white/90 p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 dark:border-slate-700 dark:bg-slate-900/90"
+                className="group relative overflow-hidden rounded-2xl border border-white/80 bg-white/85 p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 dark:border-slate-700 dark:bg-slate-900/85"
               >
                 <span className="absolute top-3 left-3 z-10 rounded-full bg-orange-500 px-2.5 py-1 text-[11px] font-bold tracking-wide text-white">
                   -{deal.discountPercent}% OFF

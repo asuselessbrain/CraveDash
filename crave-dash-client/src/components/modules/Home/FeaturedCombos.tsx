@@ -50,17 +50,18 @@ const combos: Combo[] = [
 export default function FeaturedCombos() {
 	return (
 		<section className="mx-auto mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
-			<div className="mb-6">
-				<h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-100">
-					💰 Save More with Combo Deals
-				</h2>
-			</div>
+			<div className="overflow-hidden rounded-[2.25rem] border border-orange-200/70 bg-linear-to-br from-orange-50 via-amber-50 to-rose-50 p-6 shadow-lg shadow-orange-500/10 sm:p-8 lg:p-10 dark:border-orange-400/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+				<div className="mb-6">
+					<h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-100">
+						💰 Save More with Combo Deals
+					</h2>
+				</div>
 
-			<div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+				<div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
 				{combos.map((combo) => (
 					<article
 						key={combo.id}
-						className="group overflow-hidden rounded-3xl border border-slate-200/75 bg-white/90 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 dark:border-slate-700 dark:bg-slate-900/90"
+						className="group overflow-hidden rounded-3xl border border-white/80 bg-white/85 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 dark:border-slate-700 dark:bg-slate-900/85"
 					>
 						<div className="relative h-44 overflow-hidden rounded-xl">
 							<Image
@@ -93,6 +94,7 @@ export default function FeaturedCombos() {
 						</Button>
 					</article>
 				))}
+				</div>
 			</div>
 		</section>
 	);

@@ -50,10 +50,13 @@ export default function HowItWork() {
 
 	return (
 		<section ref={sectionRef} className="mx-auto mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
-			<div className="bg-white/75 p-6 shadow-sm backdrop-blur-sm sm:p-8">
-				<h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-100">
-					Order in 3 Simple Steps
-				</h2>
+			<div className="overflow-hidden rounded-[2.25rem] border border-orange-200/70 bg-linear-to-br from-orange-50 via-amber-50 to-rose-50 p-6 shadow-lg shadow-orange-500/10 sm:p-8 lg:p-10 dark:border-orange-400/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+				<div className="max-w-2xl">
+					<p className="text-xs font-semibold tracking-[0.13em] text-orange-700 uppercase dark:text-orange-300">How it works</p>
+					<h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-100">
+						Order in 3 Simple Steps
+					</h2>
+				</div>
 
 				<div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
 					{steps.map((step, index) => {
@@ -62,12 +65,12 @@ export default function HowItWork() {
 						return (
 							<article
 								key={step.id}
-								className={`rounded-2xl border border-slate-200/80 bg-linear-to-br from-orange-50 to-amber-50 p-5 transition-all duration-700 dark:border-slate-700 dark:from-slate-900 dark:to-slate-800 ${
+								className={`group rounded-2xl border border-white/80 bg-white/80 p-5 shadow-sm backdrop-blur-sm transition-all duration-700 hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 dark:border-slate-700 dark:bg-slate-900/75 ${
 									isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
 								}`}
 								style={{ transitionDelay: `${index * 140}ms` }}
 							>
-								<div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500 text-white shadow-lg shadow-orange-500/25">
+								<div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500 text-white shadow-lg shadow-orange-500/25 transition group-hover:scale-110">
 									<Icon className="h-5 w-5" />
 								</div>
 

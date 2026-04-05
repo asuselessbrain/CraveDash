@@ -39,18 +39,19 @@ function renderStars(rating: number) {
 
 export default function TrendingNow() {
 	return (
-		<section className="mx-auto mt-14 max-w-7xl px-4 sm:px-6 lg:px-8">
-			<div className="mb-6 flex items-center justify-between gap-3">
-				<h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-100">
-					🔥 Trending This Week
-				</h2>
-			</div>
+		<section className="mx-auto mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
+			<div className="overflow-hidden rounded-[2.25rem] border border-orange-200/70 bg-linear-to-br from-orange-50 via-amber-50 to-rose-50 p-6 shadow-lg shadow-orange-500/10 sm:p-8 lg:p-10 dark:border-orange-400/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+				<div className="mb-6 flex items-center justify-between gap-3">
+					<h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-100">
+						🔥 Trending This Week
+					</h2>
+				</div>
 
-			<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+				<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
 				{trendingMeals.map((meal) => (
 					<article
 						key={meal.id}
-						className="group overflow-hidden rounded-2xl border border-slate-200/75 bg-white/90 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 dark:border-slate-700 dark:bg-slate-900/85"
+						className="group overflow-hidden rounded-2xl border border-white/80 bg-white/85 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 dark:border-slate-700 dark:bg-slate-900/85"
 					>
 						<div className="relative h-42 overflow-hidden">
 							<Image
@@ -86,6 +87,7 @@ export default function TrendingNow() {
 						</div>
 					</article>
 				))}
+				</div>
 			</div>
 		</section>
 	);

@@ -80,18 +80,19 @@ const cuisines: Cuisine[] = [
 export default function CuisineExplorer() {
 	return (
 		<section className="mx-auto mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
-			<div className="mb-6">
-				<h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-100">
-					Explore Cuisines from Around the World
-				</h2>
-			</div>
+			<div className="overflow-hidden rounded-[2.25rem] border border-orange-200/70 bg-linear-to-br from-orange-50 via-amber-50 to-rose-50 p-6 shadow-lg shadow-orange-500/10 sm:p-8 lg:p-10 dark:border-orange-400/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+				<div className="mb-6">
+					<h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-100">
+						Explore Cuisines from Around the World
+					</h2>
+				</div>
 
-			<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+				<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
 				{cuisines.map((cuisine) => (
 					<Link
 						key={cuisine.id}
 						href={`/browse?cuisine=${cuisine.slug}`}
-						className="group relative h-78 overflow-hidden rounded-3xl border border-white/40 shadow-md shadow-black/10"
+						className="group relative h-78 overflow-hidden rounded-3xl border border-white/60 shadow-md shadow-black/10"
 					>
 						<Image
 							src={cuisine.image}
@@ -114,6 +115,7 @@ export default function CuisineExplorer() {
 						</div>
 					</Link>
 				))}
+				</div>
 			</div>
 		</section>
 	);
