@@ -6,6 +6,8 @@ model Cuisine {
     createdAt DateTime      @default(now())
     updatedAt DateTime      @updatedAt
 
+    categories Category[]
+
     @@map("cuisines")
 }
 

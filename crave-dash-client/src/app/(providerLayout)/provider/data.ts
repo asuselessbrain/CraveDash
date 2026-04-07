@@ -1,6 +1,6 @@
 export type ProviderOrderStatus = "Placed" | "Preparing" | "Ready" | "Delivered" | "Cancelled";
 export type MealStatus = "Active" | "Paused";
-export type ProviderCategoryStatus = "Active" | "Hidden";
+export type ProviderCategoryStatus = "ACTIVE" | "INACTIVE";
 
 export type ProviderDashboardStats = {
     totalOrders: number;
@@ -41,12 +41,12 @@ export type ProviderOrder = {
 };
 
 export type ProviderCategory = {
-    id: string;
+    id?: string;
     name: string;
-    cuisine: string;
-    image: string;
-    meals: number;
-    status: ProviderCategoryStatus;
+    cuisine?: string;
+    cuisineId?: string;
+    image?: string;
+    status?: ProviderCategoryStatus;
 };
 
 export type ProviderCuisine = {
@@ -54,6 +54,7 @@ export type ProviderCuisine = {
     name: string;
     image: string;
     meals?: number;
+    status?: string
 };
 
 export const providerStats: ProviderDashboardStats = {
@@ -179,22 +180,6 @@ export const providerOrderDetailMap: Record<string, ProviderOrder> = providerOrd
     accumulator[order.id.toLowerCase()] = order;
     return accumulator;
 }, {});
-
-export const providerCategories: ProviderCategory[] = [
-    { id: "cat-1", name: "Pizza", cuisine: "Italian", image: "/categories/pizza.svg", meals: 12, status: "Active" },
-    { id: "cat-2", name: "Burger", cuisine: "American", image: "/categories/burger.svg", meals: 8, status: "Active" },
-    { id: "cat-3", name: "Biryani", cuisine: "Indian", image: "/categories/biryani.svg", meals: 6, status: "Active" },
-    { id: "cat-4", name: "Dessert", cuisine: "Continental", image: "/categories/desserts.svg", meals: 5, status: "Active" },
-    { id: "cat-5", name: "Beverages", cuisine: "Continental", image: "/categories/beverages.svg", meals: 4, status: "Hidden" },
-];
-
-export const providerCuisines: ProviderCuisine[] = [
-    { id: "cui-1", name: "Italian", image: "/cuisines/italian.svg", meals: 8 },
-    { id: "cui-2", name: "Chinese", image: "/cuisines/chinese.svg", meals: 10 },
-    { id: "cui-3", name: "Indian", image: "/cuisines/indian.svg", meals: 12 },
-    { id: "cui-4", name: "Mexican", image: "/cuisines/mexican.svg", meals: 6 },
-    { id: "cui-5", name: "Japanese", image: "/cuisines/japanese.svg", meals: 7 },
-];
 
 export const mealCategories = ["All", "Pizza", "Burger", "Biryani", "Dessert"] as const;
 export const cuisineOptions = ["Italian", "Chinese", "Indian", "Mexican", "Japanese", "Thai", "Turkish", "Lebanese", "American", "Continental"] as const;

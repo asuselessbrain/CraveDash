@@ -13,6 +13,17 @@ const createCuisine = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
+const getCuisines = catchAsync(async (req: Request, res: Response) => {
+    
+    const result = await CuisineService.getCuisines(req.query);
+
+    res.status(200).json({
+        success: true,
+        message: "Cuisines retrieved successfully",
+        data: result
+    })
+})
 export const CuisineController = {
-    createCuisine
+    createCuisine,
+    getCuisines
 }

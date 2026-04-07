@@ -21,16 +21,13 @@ const emptyForm: CuisineForm = {
     image: "/cuisines/italian.svg",
 };
 
-type CuisineFormProps = {
-    onSuccess?: () => void;
-};
 
-export default function CuisineForm({ onSuccess }: CuisineFormProps) {
+export default function CuisineForm() {
     const [form, setForm] = useState<CuisineForm>(emptyForm);
     const [isUploading, setIsUploading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleFileChange = async(event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
         setIsUploading(true);
@@ -47,7 +44,7 @@ export default function CuisineForm({ onSuccess }: CuisineFormProps) {
         }
     };
 
-    const saveCuisine = async() => {
+    const saveCuisine = async () => {
         if (!form.name.trim()) return;
 
         const nextCuisine: ProviderCuisine = {
@@ -61,7 +58,6 @@ export default function CuisineForm({ onSuccess }: CuisineFormProps) {
             if (result?.success) {
                 toast.success(result.message || "Cuisine saved successfully!");
                 setForm(emptyForm);
-                onSuccess?.();
                 return;
             }
 
@@ -110,15 +106,17 @@ export default function CuisineForm({ onSuccess }: CuisineFormProps) {
                 <DialogClose asChild>
                     <Button variant="outline" className="rounded-xl" disabled={isUploading || isSubmitting}>Cancel</Button>
                 </DialogClose>
-                <Button onClick={saveCuisine} className="rounded-xl bg-orange-500 text-white hover:bg-orange-400" disabled={isActionDisabled}>
-                    {isSubmitting ? (
-                        <>
-                            <Loader2 className="h-4 w-4 animate-spin" /> Saving...
-                        </>
-                    ) : (
-                        "Save Cuisine"
-                    )}
-                </Button>
+                <DialogClose asChild>
+                    <Button onClick={saveCuisine} className="rounded-xl bg-orange-500 text-white hover:bg-orange-400" disabled={isActionDisabled}>
+                        {isSubmitting ? (
+                            <>
+                                <Loader2 className="h-4 w-4 animate-spin" /> Saving...
+                            </>
+                        ) : (
+                            "Save Cuisine"
+                        )}
+                    </Button>
+                </DialogClose>
             </DialogFooter>
         </DialogContent>
     )

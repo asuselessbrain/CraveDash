@@ -3,17 +3,17 @@ import { prisma } from "../../lib/prisma";
 import { pagination } from "../../utils/pagination";
 import { searching } from "../../utils/searching";
 
-const createCuisine = async (payload: Prisma.CuisineCreateInput) => {
-    const result = await prisma.cuisine.create({
+const createCategory = async (payload: Prisma.CategoryCreateInput) => {
+    const result = await prisma.category.create({
         data: payload
     })
     return result;
 }
 
-const getCuisines = async (query: Record<string, unknown>) => {
+const getCategories = async (query: Record<string, unknown>) => {
 
     const { searchTerm, skip, take, sortBy, sortOrder } = query;
-    const allowedSortFields: Array<keyof Prisma.CuisineOrderByWithRelationInput> = [
+    const allowedSortFields: Array<keyof Prisma.CategoryOrderByWithRelationInput> = [
         "id",
         "name",
         "image",
@@ -23,7 +23,7 @@ const getCuisines = async (query: Record<string, unknown>) => {
     ];
 
     const requestedSortField = typeof sortBy === "string" ? sortBy.trim() : "";
-    const safeSortBy = allowedSortFields.includes(requestedSortField as keyof Prisma.CuisineOrderByWithRelationInput)
+    const safeSortBy = allowedSortFields.includes(requestedSortField as keyof Prisma.CategoryOrderByWithRelationInput)
         ? requestedSortField
         : "createdAt";
 
@@ -65,14 +65,7 @@ const getCuisines = async (query: Record<string, unknown>) => {
     };
 };
 
-const getAllCuisinesForCategory = async () => {
-    const result = await prisma.cuisine.findMany({
-    })
-    return result;
-}
-
-export const CuisineService = {
-    createCuisine,
-    getCuisines,
-    getAllCuisinesForCategory
+export const CategoryService = {
+    createCategory,
+    getCategories
 }
