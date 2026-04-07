@@ -27,7 +27,8 @@ const getCategories = async (query: Record<string, unknown>) => {
         ? requestedSortField
         : "createdAt";
 
-    let inputFilter: Prisma.CuisineWhereInput[] = [];
+    let inputFilter: Prisma.CategoryWhereInput[] = [];
+
 
     if (searchTerm) {
         inputFilter = searching(inputFilter, ["name"], String(searchTerm));
@@ -36,7 +37,7 @@ const getCategories = async (query: Record<string, unknown>) => {
     const { currentPage, skipValue, takeValue, sortByField, sortOrderValue } =
         pagination(Number(skip), Number(take), safeSortBy, sortOrder === "asc" ? "asc" : "desc");
 
-    const result = await prisma.cuisine.findMany({
+    const result = await prisma.category.findMany({
         where: {
             AND: inputFilter,
         }, skip: skipValue,
@@ -46,7 +47,7 @@ const getCategories = async (query: Record<string, unknown>) => {
         }
     });
 
-    const total = await prisma.cuisine.count({
+    const total = await prisma.category.count({
         where: {
             AND: inputFilter,
         }

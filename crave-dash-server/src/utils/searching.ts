@@ -1,11 +1,13 @@
 import { Prisma } from "../../generated/prisma/client";
 
-export const searching = (
-  inputFilter: Prisma.CuisineWhereInput[],
+type SearchableWhereInput = Prisma.CuisineWhereInput | Prisma.CategoryWhereInput;
+
+export const searching = <T extends SearchableWhereInput>(
+  inputFilter: T[],
   searchFields: string[],
   searchTerm: string,
-): Prisma.CuisineWhereInput[] => {
-  const orConditions: Prisma.CuisineWhereInput[] = searchFields.map((field) => {
+): T[] => {
+  const orConditions = searchFields.map((field) => {
     if (field.includes(".")) {
       const parts = field.split(".");
       let currentStructure: Record<string, unknown> = {
@@ -18,13 +20,13 @@ export const searching = (
         currentStructure = { [key]: currentStructure };
       }
 
-      return currentStructure as Prisma.CuisineWhereInput;
+      return currentStructure as T;
     }
 
     return {
       [field]: { contains: String(searchTerm), mode: "insensitive" },
-    } as Prisma.CuisineWhereInput;
+    } as unknown as T;
   });
 
-  return [...inputFilter, { OR: orConditions }];
+  return [...inputFilter, { OR: orConditions } as unknown as T];
 };
