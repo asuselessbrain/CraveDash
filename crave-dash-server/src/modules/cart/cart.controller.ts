@@ -53,10 +53,35 @@ const removeFromCart = catchAsync(async (req: Request & { user?: any }, res: Res
     });
 });
 
+const increaseCartItemQuantity = catchAsync(async (req: Request, res: Response) => {
+    const cartId = req.params.cartId as string;
+
+    const result = await CartService.increaseCartItemQuantity(cartId);
+
+    res.status(200).json({
+        success: true,
+        message: "Cart item quantity increased successfully",
+        data: result,
+    });
+})
+
+const decreaseCartItemQuantity = catchAsync(async (req: Request, res: Response) => {
+    const cartId = req.params.cartId as string;
+
+    const result = await CartService.decreaseCartItemQuantity(cartId);
+
+    res.status(200).json({
+        success: true,
+        message: "Cart item quantity decreased successfully",
+        data: result,
+    });
+})
 
 export const CartController = {
     addToCart,
     getCartItems,
     clearCart,
     removeFromCart,
+    increaseCartItemQuantity,
+    decreaseCartItemQuantity
 };

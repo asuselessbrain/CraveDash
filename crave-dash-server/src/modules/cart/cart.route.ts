@@ -9,5 +9,7 @@ router.post("/", auth(Role.CUSTOMER, Role.ADMIN, Role.PROVIDER), CartController.
 router.get("/", auth(Role.CUSTOMER, Role.ADMIN, Role.PROVIDER), CartController.getCartItems);
 router.delete("/", auth(Role.CUSTOMER, Role.ADMIN, Role.PROVIDER), CartController.clearCart);
 router.delete("/:cartId/:mealId", auth(Role.CUSTOMER, Role.ADMIN, Role.PROVIDER), CartController.removeFromCart);
+router.patch("/:cartId/increase", auth(Role.CUSTOMER, Role.ADMIN, Role.PROVIDER), CartController.increaseCartItemQuantity);
+router.patch("/:cartId/decrease", auth(Role.CUSTOMER, Role.ADMIN, Role.PROVIDER), CartController.decreaseCartItemQuantity);
 
 export const CartRoutes = router;

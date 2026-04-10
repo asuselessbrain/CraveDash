@@ -23,6 +23,7 @@ import { NormalizedMealDetails } from "@/types/meals";
 import Link from "next/link";
 import { addToCart } from "@/services/cart";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type MealDetailsContentProps = {
     meal: NormalizedMealDetails;
@@ -72,6 +73,7 @@ export default function MealDetailsContent({ meal }: MealDetailsContentProps) {
     const [activeImage, setActiveImage] = useState(meal.image);
     const [quantity, setQuantity] = useState(1);
     const [showReviewsMore, setShowReviewsMore] = useState(false);
+    const router = useRouter();
 
     const isAvailable = meal.availabilityStatus === "AVAILABLE";
     const canOrder = isAvailable && meal.stockQuantity > 0;
@@ -107,6 +109,7 @@ export default function MealDetailsContent({ meal }: MealDetailsContentProps) {
 
         if(res.success){
             toast.success(res.message || "Added to cart!");
+            router.push("/cart");
         }
         else{
             toast.error(res.errorMessage || "Failed to add to cart. Please try again.");

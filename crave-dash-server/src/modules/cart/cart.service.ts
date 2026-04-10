@@ -114,9 +114,40 @@ const getCartItems = async (userEmail: string) => {
         }
     };
 };
+
+const increaseCartItemQuantity = async (cartId: string) => {
+    const result = await prisma.cart.update({
+        where: {
+            id: cartId
+        },
+        data: {
+            quantity: {
+                increment: 1
+            }
+        },
+    });
+    return result;
+}
+
+const decreaseCartItemQuantity = async (cartId: string) => {
+    const result = await prisma.cart.update({
+        where: {
+            id: cartId
+        },
+        data: {
+            quantity: {
+                decrement: 1
+            }
+        },
+    });
+    return result;
+}
+
 export const CartService = {
     addToCart,
     clearCart,
     removeFromCart,
-    getCartItems
+    getCartItems,
+    increaseCartItemQuantity,
+    decreaseCartItemQuantity
 };

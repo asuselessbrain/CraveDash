@@ -10,7 +10,22 @@ export const getCartItems = async () => {
     return result;
 }
 
-export const clearCart = async() => {
+export const clearCart = async () => {
     const result = await baseApi(`cart`, "DELETE");
+    return result;
+}
+
+export const removeItemFromCart = async (itemId: string, mealId: string) => {
+    const result = await baseApi(`cart/${itemId}/${mealId}`, "DELETE");
+    return result;
+}
+
+export const increaseCartItemQuantity = async (itemId: string) => {
+    const result = await baseApi(`cart/${itemId}/increase`, "PATCH");
+    return result;
+}
+
+export const decreaseCartItemQuantity = async (itemId: string) => {
+    const result = await baseApi(`cart/${itemId}/decrease`, "PATCH");
     return result;
 }
