@@ -71,8 +71,19 @@ const getAllCuisinesForCategory = async () => {
     return result;
 }
 
+const getAllCuisinesForFiltering = async () => {
+    const result = await prisma.cuisine.findMany({
+        select: {
+            id: true,
+            name: true,
+        }
+    });
+    return result;
+};
+
 export const CuisineService = {
     createCuisine,
     getCuisines,
-    getAllCuisinesForCategory
+    getAllCuisinesForCategory,
+    getAllCuisinesForFiltering
 }

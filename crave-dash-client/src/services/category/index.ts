@@ -20,3 +20,8 @@ export const getCategories = async (queryParams?: QueryParams) => {
     const result = await baseApi("category", "GET", undefined, params.toString());
     return result;
 };
+
+export const getCategoryForSlider = async () => {
+    const result = await baseApi("category/slider", "GET");
+    return result;
+}

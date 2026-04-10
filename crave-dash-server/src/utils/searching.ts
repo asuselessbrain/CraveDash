@@ -1,6 +1,9 @@
 import { Prisma } from "../../generated/prisma/client";
 
-type SearchableWhereInput = Prisma.CuisineWhereInput | Prisma.CategoryWhereInput;
+type SearchableWhereInput =
+  | Prisma.CuisineWhereInput
+  | Prisma.CategoryWhereInput
+  | Prisma.MealWhereInput;
 
 export const searching = <T extends SearchableWhereInput>(
   inputFilter: T[],

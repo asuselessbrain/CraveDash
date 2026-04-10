@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
 
-export const cookieOptions = {
+const cookieOptions = {
   httpOnly: true,
   expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
   secure: process.env.NODE_ENV === "production",
@@ -36,6 +36,7 @@ export const signInUser = async (data: FieldValues) => {
 
 export const signUpUser = async (data: FieldValues) => {
   const cookieStore = await cookies()
+  console.log(data)
   try {
     const res = await fetch(
       "http://localhost:5000/api/v1/user/customers",
@@ -52,6 +53,7 @@ export const signUpUser = async (data: FieldValues) => {
     if (result.success) {
       cookieStore.set("token", result.data.token, cookieOptions)
     }
+    console.log(result)
     return result;
   }
   catch (error) {

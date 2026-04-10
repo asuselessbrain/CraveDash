@@ -23,7 +23,21 @@ const getCategories = catchAsync(async (req: Request, res: Response) => {
         data: result
     })
 })
+
+const getAllCategoriesForSlider = catchAsync(async (req: Request, res: Response) => {
+    
+    const result = await CategoryService.getAllCategoriesForSlider();
+
+    res.status(200).json({
+        success: true,
+        message: "Categories for slider retrieved successfully",
+        data: result
+    })
+})
+
+
 export const CategoryController = {
     createCategory,
-    getCategories
+    getCategories,
+    getAllCategoriesForSlider
 }

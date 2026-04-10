@@ -3,6 +3,7 @@ model Category {
 	name      String
 	cuisineId String
 	cuisine   Cuisine        @relation(fields: [cuisineId], references: [id], onDelete: Cascade)
+	meals     Meal[]
 	image     String?
 	status    CategoryStatus @default(ACTIVE)
 	createdAt DateTime       @default(now())

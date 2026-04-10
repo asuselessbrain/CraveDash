@@ -1,5 +1,7 @@
 import { AuthRoutes } from "../../modules/auth/auth.route";
+import { CartRoutes } from "../../modules/cart/cart.route";
 import { CuisineRoutes } from "../../modules/cuisine/cuisine.route";
+import { MealRoutes } from "../../modules/meal/meal.route";
 import { UserRoutes } from "../../modules/user/user.route";
 import express from "express";
 import { CategoryRoutes } from "../../modules/category/category.route";
@@ -22,6 +24,14 @@ const routes = [
   {
     path: "/category",
     route: CategoryRoutes
+  },
+  {
+    path: "/meal",
+    route: MealRoutes
+  },
+  {
+    path: "/cart",
+    route: CartRoutes,
   }
 ];
 

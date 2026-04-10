@@ -25,24 +25,22 @@ const createCustomer = async (data: CustomerInput) => {
     phone: data.phoneNumber ?? null,
   };
 
-  const result = await prisma.$transaction(async (transactionClient) => {
-    await transactionClient.user.create({
-      data: useData,
-    });
 
-    const customer = await transactionClient.customer.create({
-      data: customerData,
-    });
-    return customer;
+
+  const user = await prisma.user.create({ data: useData });
+
+  const customer = await prisma.customer.create({
+    data: customerData,
   });
 
-  const token = jwt.sign(
-      { email: customerData.email, role: useData.role },
-      String(config.jwt.secret),
-      { expiresIn: config.jwt.expiresIn as StringValue },
-    );
 
-  return { ...result, token };
+  const token = jwt.sign(
+    { email: customerData.email, role: useData.role },
+    String(config.jwt.secret),
+    { expiresIn: config.jwt.expiresIn as StringValue },
+  );
+
+  return { ...customer, token };
 };
 
 export const UserService = {

@@ -23,7 +23,20 @@ const getCuisines = catchAsync(async (req: Request, res: Response) => {
         data: result
     })
 })
+
+const getAllCuisinesForFiltering = catchAsync(async (req: Request, res: Response) => {
+    
+    const result = await CuisineService.getAllCuisinesForFiltering();
+
+    res.status(200).json({
+        success: true,
+        message: "Cuisines for filtering retrieved successfully",
+        data: result
+    })
+})
+
 export const CuisineController = {
     createCuisine,
-    getCuisines
+    getCuisines,
+    getAllCuisinesForFiltering
 }

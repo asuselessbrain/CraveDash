@@ -1,0 +1,52 @@
+model Meal {
+	id                 String               @id @default(uuid())
+	name               String
+	description        String
+	categoryId         String
+	category           Category             @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+	price              Decimal              @db.Decimal(10, 2)
+	image              String?
+	images             String[]
+	availabilityStatus MealAvailabilityStatus @default(AVAILABLE)
+	preparationTime    Int?
+	servingSize        Int?
+	mealType           MealType
+	dietaryTag         DietaryTag
+	spiceLevel         SpiceLevel
+	ingredients        String[]
+	discount           Decimal?             @db.Decimal(10, 2)
+	stockQuantity      Int                  @default(0)
+	isPopular          Boolean              @default(false)
+	isFeatured         Boolean              @default(false)
+	videoUrl           String?
+	createdAt          DateTime             @default(now())
+	updatedAt          DateTime             @updatedAt
+	carts              cart[]
+
+	@@index([categoryId])
+	@@map("meals")
+}
+
+enum MealAvailabilityStatus {
+	AVAILABLE
+	UNAVAILABLE
+}
+
+enum MealType {
+	BREAKFAST
+	LUNCH
+	DINNER
+}
+
+enum DietaryTag {
+	VEG
+	NON_VEG
+	VEGAN
+}
+
+enum SpiceLevel {
+	MILD
+	MEDIUM
+	HOT
+	EXTRA_HOT
+}

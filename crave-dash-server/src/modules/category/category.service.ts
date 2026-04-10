@@ -29,9 +29,8 @@ const getCategories = async (query: Record<string, unknown>) => {
 
     let inputFilter: Prisma.CategoryWhereInput[] = [];
 
-
     if (searchTerm) {
-        inputFilter = searching(inputFilter, ["name"], String(searchTerm));
+        inputFilter = searching(inputFilter, ["name", "cuisine.name"], String(searchTerm));
     }
 
     const { currentPage, skipValue, takeValue, sortByField, sortOrderValue } =
@@ -66,7 +65,13 @@ const getCategories = async (query: Record<string, unknown>) => {
     };
 };
 
+const getAllCategoriesForSlider = async () => {
+    const result = await prisma.category.findMany()
+    return result;
+}
+
 export const CategoryService = {
     createCategory,
-    getCategories
+    getCategories,
+    getAllCategoriesForSlider
 }

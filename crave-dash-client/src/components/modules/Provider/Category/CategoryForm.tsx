@@ -91,7 +91,7 @@ export default function CategoryForm({ cuisineOptions }: { cuisineOptions: Cuisi
     const isActionDisabled = isUploading || isSubmitting || !form.name.trim() || !form.cuisineId;
 
     return (
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-[calc(100%-1rem)] sm:max-w-lg">
             <DialogHeader>
                 <DialogTitle>{form.id ? "Edit Category" : "Add New Category"}</DialogTitle>
                 <DialogDescription>Create or update a category name and image.</DialogDescription>

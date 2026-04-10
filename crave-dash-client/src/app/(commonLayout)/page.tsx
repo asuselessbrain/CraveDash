@@ -52,16 +52,16 @@ export default function HomePage() {
 
                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
                             <div className="relative h-36 overflow-hidden rounded-2xl border border-white/60 sm:h-44 dark:border-white/15">
-                                <Image src="/categories/pizza.svg" alt="Featured pizza" fill sizes="(min-width: 1024px) 20vw, 40vw" className="object-cover" />
+                                <Image src="https://res.cloudinary.com/dwduymu1l/image/upload/v1775661389/easy_pizza_recipe_800x800_bhqbz3.webp" alt="Featured pizza" fill sizes="(min-width: 1024px) 20vw, 40vw" className="object-cover" />
                             </div>
                             <div className="relative h-36 overflow-hidden rounded-2xl border border-white/60 sm:h-44 dark:border-white/15">
-                                <Image src="/categories/biryani.svg" alt="Featured biryani" fill sizes="(min-width: 1024px) 20vw, 40vw" className="object-cover" />
+                                <Image src="https://res.cloudinary.com/dwduymu1l/image/upload/v1775661388/mutton-biriyani__570x380_x1hh5b.jpg" alt="Featured biryani" fill sizes="(min-width: 1024px) 20vw, 40vw" className="object-cover" />
                             </div>
                             <div className="relative h-36 overflow-hidden rounded-2xl border border-white/60 sm:h-44 dark:border-white/15">
-                                <Image src="/categories/chinese.svg" alt="Featured chinese" fill sizes="(min-width: 1024px) 20vw, 40vw" className="object-cover" />
+                                <Image src="https://res.cloudinary.com/dwduymu1l/image/upload/v1775661597/81240320007-99-65364_ahmema.webp" alt="Featured chinese" fill sizes="(min-width: 1024px) 20vw, 40vw" className="object-cover" />
                             </div>
                             <div className="relative h-36 overflow-hidden rounded-2xl border border-white/60 sm:h-44 dark:border-white/15">
-                                <Image src="/categories/desserts.svg" alt="Featured desserts" fill sizes="(min-width: 1024px) 20vw, 40vw" className="object-cover" />
+                                <Image src="https://res.cloudinary.com/dwduymu1l/image/upload/v1775661388/feature-img-which-scooby-doo-character_lyqxmb.webp" alt="Featured desserts" fill sizes="(min-width: 1024px) 20vw, 40vw" className="object-cover" />
                             </div>
                         </div>
                     </div>

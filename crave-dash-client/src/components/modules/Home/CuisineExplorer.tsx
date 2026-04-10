@@ -92,7 +92,7 @@ export default function CuisineExplorer() {
 					<Link
 						key={cuisine.id}
 						href={`/browse?cuisine=${cuisine.slug}`}
-						className="group relative h-78 overflow-hidden rounded-3xl border border-white/60 shadow-md shadow-black/10"
+						className="group relative aspect-[4/5] overflow-hidden rounded-3xl border border-white/60 shadow-md shadow-black/10 sm:aspect-[3/4]"
 					>
 						<Image
 							src={cuisine.image}

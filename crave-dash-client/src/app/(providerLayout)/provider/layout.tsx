@@ -29,7 +29,7 @@ export default function ProviderLayout({ children }: { children: React.ReactNode
                         </div>
                     </div>
 
-                    <nav className="mt-6 grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
+                    <nav className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
                         {navigation.map((item) => {
                             const Icon = item.icon;
                             const active = pathname === item.href;

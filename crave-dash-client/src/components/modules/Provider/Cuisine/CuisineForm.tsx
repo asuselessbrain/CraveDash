@@ -72,7 +72,7 @@ export default function CuisineForm() {
     const isActionDisabled = isUploading || isSubmitting || !form.name.trim();
 
     return (
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-[calc(100%-1rem)] sm:max-w-lg">
             <DialogHeader>
                 <DialogTitle>{form.id ? "Edit Cuisine" : "Add New Cuisine"}</DialogTitle>
                 <DialogDescription>Create or update a cuisine type with a name and image.</DialogDescription>

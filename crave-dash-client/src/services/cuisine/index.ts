@@ -20,3 +20,8 @@ export const getCuisines = async (queryParams?: QueryParams) => {
     const result = await baseApi("cuisine", "GET", undefined, params.toString())
     return result;
 }
+
+export const getCuisinesForFiltering = async () => {
+    const result = await baseApi("cuisine/filtering", "GET")
+    return result;
+}

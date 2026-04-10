@@ -16,7 +16,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-            <div className="mx-auto flex min-h-screen max-w-400 flex-col lg:flex-row">
+            <div className="mx-auto flex min-h-screen w-full max-w-screen-2xl flex-col lg:flex-row">
                 <aside className="flex flex-col border-b border-slate-200 bg-white/95 px-4 py-4 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/95 lg:sticky lg:top-0 lg:h-screen lg:w-72 lg:border-r lg:border-b-0 lg:px-5 lg:py-6">
                     <div className="flex items-center gap-3 rounded-2xl border border-orange-200/70 bg-orange-50 px-4 py-3 dark:border-orange-400/20 dark:bg-orange-500/10">
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500 text-white">
@@ -28,7 +28,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         </div>
                     </div>
 
-                    <nav className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+                    <nav className="mt-6 grid gap-2 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1">
                         {navigation.map((item) => {
                             const Icon = item.icon;
                             const active = pathname === item.href;

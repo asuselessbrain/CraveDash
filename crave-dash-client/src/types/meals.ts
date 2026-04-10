@@ -1,0 +1,71 @@
+export type MealDetailsFromAPI = {
+    id: string;
+    name: string;
+    description: string;
+    categoryId: string;
+    price: string | number;
+    image: string;
+    images: string[];
+    availabilityStatus: "AVAILABLE" | "UNAVAILABLE";
+    preparationTime: number;
+    servingSize: string | null;
+    mealType: "BREAKFAST" | "LUNCH" | "DINNER" | string;
+    dietaryTag: "VEG" | "NON_VEG" | "VEGAN" | string;
+    spiceLevel: "MILD" | "MEDIUM" | "HOT" | "EXTRA_HOT" | string;
+    ingredients: string[];
+    discount: string | number;
+    stockQuantity: number;
+    isPopular: boolean;
+    isFeatured: boolean;
+    videoUrl?: string;
+    createdAt: string;
+    updatedAt: string;
+    category: {
+        id: string;
+        name: string;
+        cuisineId: string;
+        image: string;
+        status: string;
+        createdAt: string;
+        updatedAt: string;
+        cuisine: {
+            id: string;
+            name: string;
+            image: string;
+            status: string;
+            createdAt: string;
+            updatedAt: string;
+        };
+    };
+    provider?: {
+        id: string;
+        name: string;
+        image: string;
+        rating: number;
+        reviews: number;
+    };
+};
+
+export type NormalizedMealDetails = {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    discount: number;
+    finalPrice: number;
+    image: string;
+    images: string[];
+    preparationTime: number;
+    servingSize: string;
+    mealType: string;
+    dietaryTag: string;
+    spiceLevel: string;
+    ingredients: string[];
+    availabilityStatus: "AVAILABLE" | "UNAVAILABLE";
+    stockQuantity: number;
+    isPopular: boolean;
+    isFeatured: boolean;
+    videoUrl: string;
+    categoryName: string;
+    cuisineName: string;
+};

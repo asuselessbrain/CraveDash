@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ModeToggle } from "./theme-toggle";
-import { Menu, X } from "lucide-react";
+import { Menu, ShoppingCart, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const NavLinks = ({ onClick }: { onClick?: () => void }) => (
@@ -116,6 +116,7 @@ const Navbar = () => {
 
           {/* Right Section */}
           <div className="flex items-center gap-4">
+            <ShoppingCart />
             <ModeToggle />
 
             {/* Desktop Login */}

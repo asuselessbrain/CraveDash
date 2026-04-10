@@ -173,6 +173,49 @@
     gap: 1rem;
     animation: provider-marquee 34s linear infinite;
   }
+
+  .dialog-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(251 146 60 / 0.75) transparent;
+  }
+
+  .dialog-scrollbar::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+
+  .dialog-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .dialog-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: linear-gradient(180deg, rgb(251 146 60 / 0.9), rgb(249 115 22 / 0.85));
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .dark .dialog-scrollbar {
+    scrollbar-color: rgb(251 146 60 / 0.7) transparent;
+  }
+
+  .dark .dialog-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgb(251 146 60 / 0.82), rgb(234 88 12 / 0.78));
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .landing-reveal,
+    .landing-reveal-delay-1,
+    .landing-reveal-delay-2,
+    .landing-reveal-delay-3,
+    .category-marquee-track,
+    .provider-marquee-track {
+      animation: none;
+      transform: none;
+    }
+  }
 }
 
 @keyframes landing-reveal-up {
