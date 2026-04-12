@@ -1,14 +1,16 @@
 model User {
-    id           String     @id @default(uuid())
-    email        String     @unique
-    password     String
-    role         Role       @default(CUSTOMER)
-    status       UserStatus @default(ACTIVE)
-    createdAt    DateTime   @default(now())
-    updatedAt    DateTime   @updatedAt
+    id        String     @id @default(uuid())
+    email     String     @unique
+    password  String
+    role      Role       @default(CUSTOMER)
+    status    UserStatus @default(ACTIVE)
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
 
-    customer Customer?
-    carts    cart[]
+    customer  Customer?
+    carts     cart[]
+    meals     Meal[]
+    orders    Order[]
 
     @@map("users")
 }

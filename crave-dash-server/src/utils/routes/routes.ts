@@ -1,7 +1,9 @@
 import { AuthRoutes } from "../../modules/auth/auth.route";
+import { DashboardRoutes } from "../../modules/dashboard/dashboard.route";
 import { CartRoutes } from "../../modules/cart/cart.route";
 import { CuisineRoutes } from "../../modules/cuisine/cuisine.route";
 import { MealRoutes } from "../../modules/meal/meal.route";
+import { OrderRoutes } from "../../modules/order/order.route";
 import { UserRoutes } from "../../modules/user/user.route";
 import express from "express";
 import { CategoryRoutes } from "../../modules/category/category.route";
@@ -18,6 +20,10 @@ const routes = [
     route: AuthRoutes
   },
   {
+    path: "/dashboard",
+    route: DashboardRoutes,
+  },
+  {
     path: "/cuisine",
     route: CuisineRoutes
   },
@@ -32,6 +38,10 @@ const routes = [
   {
     path: "/cart",
     route: CartRoutes,
+  },
+  {
+    path: "/order",
+    route: OrderRoutes,
   }
 ];
 

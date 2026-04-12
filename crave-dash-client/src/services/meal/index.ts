@@ -1,5 +1,7 @@
+"use server";
 import { QueryParams } from "@/types";
 import { baseApi } from "../baseApi";
+import { revalidateTag } from "next/cache";
 
 type MealPayload = {
     name: string;
@@ -23,7 +25,8 @@ type MealPayload = {
 };
 
 export const createMeal = async (data: MealPayload) => {
-    const result = await baseApi("meal", "POST", data);
+    const result = await baseApi("meal", "POST", data, undefined, "meals");
+    revalidateTag("meals", "max");
     return result;
 };
 
@@ -38,22 +41,22 @@ export const getProviderMeals = async (queryParams?: QueryParams) => {
         });
     }
 
-    const result = await baseApi("meal/provider", "GET", undefined, params.toString());
+    const result = await baseApi("meal/provider", "GET", undefined, params.toString(), "meals");
     return result;
 };
 
 export const getMealById = async (mealId: string) => {
-    const result = await baseApi(`meal/${mealId}`, "GET");
+    const result = await baseApi(`meal/${mealId}`, "GET", undefined, undefined, "meals");
     return result;
 };
 
 export const deleteMeal = async (mealId: string) => {
-    const result = await baseApi(`meal/${mealId}`, "DELETE");
+    const result = await baseApi(`meal/${mealId}`, "DELETE", undefined, undefined, "meals");
     return result;
 };
 
 export const updateMeal = async (mealId: string, data: MealPayload) => {
-    const result = await baseApi(`meal/${mealId}`, "PUT", data);
+    const result = await baseApi(`meal/${mealId}`, "PUT", data, undefined, "meals");
     return result;
 };
 
@@ -69,6 +72,6 @@ export const getMeals = async (queryParams?: QueryParams) => {
         });
     }
 
-    const result = await baseApi("meal", "GET", undefined, params.toString());
+    const result = await baseApi("meal", "GET", undefined, params.toString(), "meals");
     return result;
 };

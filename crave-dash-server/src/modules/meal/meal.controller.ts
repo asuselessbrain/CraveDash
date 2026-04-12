@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { MealService } from "./meal.service";
 
-const createMeal = catchAsync(async (req: Request, res: Response) => {
+const createMeal = catchAsync(async (req: Request & { user?: { email: string } }, res: Response) => {
+
+    const email = req.user?.email as string;
     
-    const result = await MealService.createMeal(req.body);
+    const result = await MealService.createMeal(req.body, email);
 
     res.status(201).json({
         success: true,

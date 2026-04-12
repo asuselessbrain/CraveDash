@@ -1,8 +1,11 @@
+"use server"
 import { QueryParams } from "@/types";
 import { baseApi } from "../baseApi"
+import { revalidateTag } from "next/cache";
 
 export const createCuisine = async (data: { name: string, image: string }) => {
-    const result = await baseApi("cuisine", "POST", data)
+    const result = await baseApi("cuisine", "POST", data, undefined, "cuisines")
+    revalidateTag("cuisines", "max")
     return result;
 }
 
@@ -17,11 +20,11 @@ export const getCuisines = async (queryParams?: QueryParams) => {
         });
     }
 
-    const result = await baseApi("cuisine", "GET", undefined, params.toString())
+    const result = await baseApi("cuisine", "GET", undefined, params.toString(), "cuisines")
     return result;
 }
 
 export const getCuisinesForFiltering = async () => {
-    const result = await baseApi("cuisine/filtering", "GET")
+    const result = await baseApi("cuisine/filtering", "GET", undefined, undefined, "cuisines")
     return result;
 }

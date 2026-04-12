@@ -11,9 +11,12 @@ const mealInclude = {
     },
 } satisfies Prisma.MealInclude;
 
-const createMeal = async (payload: Prisma.MealUncheckedCreateInput) => {
+const createMeal = async (payload: Prisma.MealUncheckedCreateInput, email: string) => {
     const result = await prisma.meal.create({
-        data: payload,
+        data: {
+            ...payload,
+            providerEmail: email,
+        },
         include: mealInclude,
     });
     return result;

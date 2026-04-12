@@ -5,7 +5,8 @@ export const baseApi = async (
     endpoint: string,
     method: string,
     data?: unknown,
-    queryString?: string
+    queryString?: string,
+    tag: string = "default"
 ) => {
 
     const cookieStore = await cookies()
@@ -18,6 +19,7 @@ export const baseApi = async (
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
+        ...(tag ? { next: { tags: [tag] } } : {}),
     }
 
     if (data !== undefined && method !== "GET" && method !== "HEAD") {

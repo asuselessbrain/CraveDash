@@ -70,8 +70,6 @@ export default function CartAction({ cartItems }: { cartItems: CartItemsPayload 
 
         const res = await (operation === "inc" ? increaseCartItemQuantity(itemId) : decreaseCartItemQuantity(itemId))
 
-        console.log(res)
-
         if (res.success) {
             toast.success(res.message || "Item quantity updated!");
         }
@@ -183,9 +181,20 @@ export default function CartAction({ cartItems }: { cartItems: CartItemsPayload 
                     </div>
                 </div>
 
-                <Button disabled={isEmpty} className="mt-6 h-11 w-full rounded-xl bg-orange-500 text-white hover:bg-orange-400">
-                    Proceed to Checkout
-                </Button>
+                {isEmpty ? (
+                    <Button
+                        disabled
+                        className="mt-6 h-11 w-full rounded-xl bg-orange-500 text-white"
+                    >
+                        Proceed to Checkout
+                    </Button>
+                ) : (
+                    <Link href="/checkout">
+                        <Button className="mt-6 h-11 w-full rounded-xl bg-orange-500 text-white hover:bg-orange-400">
+                            Proceed to Checkout
+                        </Button>
+                    </Link>
+                )}
 
                 <Button asChild variant="outline" className="mt-3 h-11 w-full rounded-xl">
                     <Link href="/meals">Add More Meals</Link>

@@ -1,0 +1,76 @@
+// Order model - Main order info thakbe
+model Order {
+  id                 String           @id @default(uuid())
+  userEmail          String
+  user               User             @relation(fields: [userEmail], references: [email])
+  
+  // Items relation
+  items              OrderItem[]
+  
+  // Delivery Address relation
+  deliveryAddress    DeliveryAddress?
+  
+  // Pricing Details
+  subtotal           Float
+  deliveryFee        Float            @default(0)
+  total              Float
+  
+  // Payment info
+  paymentMethod      PaymentMethod    @default(CASH_ON_DELIVERY)
+  paymentStatus      PaymentStatus    @default(PENDING)
+  orderStatus        OrderStatus      @default(PENDING)
+  
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+}
+
+// OrderItem model - Multiple items handle korar jonno
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  mealId    String
+  meal      Meal     @relation(fields: [mealId], references: [id])
+  
+  quantity  Int      @default(1)
+  // Order er somoy price koto chilo seta store kora bhalo (future-e price change holeo record thakbe)
+  price     Float    
+  
+  createdAt DateTime @default(now())
+}
+
+// DeliveryAddress model - Separated for cleaner data
+model DeliveryAddress {
+  id                   String  @id @default(uuid())
+  orderId              String  @unique // One-to-one with Order
+  order                Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  fullName             String
+  phoneNumber          String
+  city                 String
+  area                 String
+  streetAddress        String
+  deliveryInstructions String?
+}
+
+// Enums for Type Safety
+enum PaymentMethod {
+  CASH_ON_DELIVERY
+  ONLINE_PAYMENT
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
