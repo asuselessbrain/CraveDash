@@ -22,10 +22,17 @@ export default function OrderStatusUpdater({ orderId, options, action }: OrderSt
       <input type="hidden" name="orderId" value={orderId} />
       <select
         name="orderStatus"
-        defaultValue={options[0]}
-        onChange={() => formRef.current?.requestSubmit()}
+        defaultValue=""
+        onChange={(event) => {
+          if (event.target.value) {
+            formRef.current?.requestSubmit();
+          }
+        }}
         className="h-9 rounded-xl border border-slate-200 bg-white px-2 text-xs font-medium outline-none transition focus:border-orange-400 dark:border-slate-700 dark:bg-slate-950"
       >
+        <option value="" disabled>
+          Change status
+        </option>
         {options.map((nextStatus) => (
           <option key={nextStatus} value={nextStatus}>
             {formatStatusLabel(nextStatus)}

@@ -20,6 +20,17 @@ const getCustomerDashboard = catchAsync(async (req: AuthenticatedRequest, res: R
   });
 });
 
+const getProviderDashboard = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
+  const result = await DashboardService.getProviderDashboard(req.user.email);
+
+  res.status(200).json({
+    success: true,
+    message: "Provider dashboard data retrieved successfully",
+    data: result,
+  });
+});
+
 export const DashboardController = {
   getCustomerDashboard,
+  getProviderDashboard,
 };

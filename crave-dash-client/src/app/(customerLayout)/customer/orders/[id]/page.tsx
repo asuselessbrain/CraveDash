@@ -5,7 +5,7 @@ import { BadgeCheck, CalendarDays, CheckCircle2, CircleDot, Clock3, MapPin, Truc
 import { Button } from "@/components/ui/button";
 import { getCustomerOrderById } from "@/services/order";
 
-type CustomerOrderStatus = "Delivered" | "On the way" | "Preparing" | "Pending" | "Cancelled";
+type CustomerOrderStatus = "Delivered" | "On the way" | "Preparing" | "Confirmed" | "Pending" | "Cancelled";
 
 type RawOrderItem = {
   name?: string;
@@ -89,11 +89,17 @@ type UiOrder = {
   total: number;
 };
 
-const timeline = [
+const inProgressTimeline = [
   { label: "Order Placed", icon: CircleDot },
+  { label: "Confirmed", icon: BadgeCheck },
   { label: "Preparing", icon: Clock3 },
   { label: "On the Way", icon: Truck },
   { label: "Delivered", icon: CheckCircle2 },
+];
+
+const cancelledTimeline = [
+  { label: "Order Placed", icon: CircleDot },
+  { label: "Cancelled", icon: BadgeCheck },
 ];
 
 function toNumber(value: unknown, fallback = 0): number {
@@ -106,6 +112,7 @@ function normalizeStatus(status?: string): CustomerOrderStatus {
 
   if (value.includes("cancel")) return "Cancelled";
   if (value.includes("pending")) return "Pending";
+  if (value.includes("confirm")) return "Confirmed";
   if (value.includes("prepar")) return "Preparing";
   if (value.includes("way") || value.includes("transit") || value.includes("ship")) return "On the way";
   if (value.includes("deliver")) return "Delivered";
@@ -121,11 +128,55 @@ function statusStyles(status: CustomerOrderStatus) {
       return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:border-blue-500/20";
     case "Preparing":
       return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/20";
+    case "Confirmed":
+      return "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-500/10 dark:text-cyan-300 dark:border-cyan-500/20";
     case "Pending":
       return "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-500/10 dark:text-violet-300 dark:border-violet-500/20";
     case "Cancelled":
       return "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-300 dark:border-rose-500/20";
   }
+}
+
+function getTrackerConfig(status: CustomerOrderStatus) {
+  if (status === "Cancelled") {
+    return {
+      timeline: cancelledTimeline,
+      activeIndex: 1,
+    };
+  }
+
+  if (status === "Pending") {
+    return {
+      timeline: inProgressTimeline,
+      activeIndex: 0,
+    };
+  }
+
+  if (status === "Confirmed") {
+    return {
+      timeline: inProgressTimeline,
+      activeIndex: 1,
+    };
+  }
+
+  if (status === "Preparing") {
+    return {
+      timeline: inProgressTimeline,
+      activeIndex: 2,
+    };
+  }
+
+  if (status === "On the way") {
+    return {
+      timeline: inProgressTimeline,
+      activeIndex: 3,
+    };
+  }
+
+  return {
+    timeline: inProgressTimeline,
+    activeIndex: 4,
+  };
 }
 
 function toOrderDate(rawOrder: RawOrder): string {
@@ -214,9 +265,7 @@ export default async function CustomerOrderDetailsPage({ params }: { params: Pro
   }
 
   const order = normalizeOrder(rawOrder, id);
-
-  const activeIndex =
-    order.status === "Cancelled" ? 0 : order.status === "Pending" ? 0 : order.status === "Preparing" ? 1 : order.status === "On the way" ? 2 : 3;
+  const tracker = getTrackerConfig(order.status);
 
   return (
     <section className="space-y-6">
@@ -309,9 +358,9 @@ export default async function CustomerOrderDetailsPage({ params }: { params: Pro
           <div className="rounded-3xl border border-orange-200/70 bg-white/90 p-6 shadow-sm dark:border-orange-400/20 dark:bg-slate-900/90">
             <h2 className="text-lg font-extrabold text-slate-900 dark:text-slate-100">Status Tracker</h2>
             <div className="mt-5 space-y-4">
-              {timeline.map((step, index) => {
+              {tracker.timeline.map((step, index) => {
                 const Icon = step.icon;
-                const isActive = index <= activeIndex;
+                const isActive = index <= tracker.activeIndex;
                 return (
                   <div key={step.label} className="flex items-center gap-3">
                     <div className={`flex h-10 w-10 items-center justify-center rounded-full border ${isActive ? "border-orange-500 bg-orange-500 text-white" : "border-slate-300 bg-white text-slate-400 dark:border-slate-700 dark:bg-slate-950"}`}>

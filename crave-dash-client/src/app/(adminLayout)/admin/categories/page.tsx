@@ -1,71 +1,58 @@
-"use client";
-
 import Image from "next/image";
-import { useState } from "react";
-import { Pencil, Plus, Trash2, Upload } from "lucide-react";
-
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { adminCategories, type AdminCategory } from "../data";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { getCategories } from "@/services/category";
+import Search from "@/components/modules/shared/SearchComponent";
+import SortingComponent from "@/components/modules/shared/SortingComponent";
+import PaginationComponent from "@/components/modules/shared/PaginationComponent";
 
-type CategoryForm = {
+type AdminCategory = {
     id?: string;
-    name: string;
-    image: string;
+    _id?: string;
+    name?: string;
+    image?: string;
+    icon?: string;
+    description?: string;
+    meals?: number;
+    mealsCount?: number;
+    status?: string;
 };
 
-const emptyForm: CategoryForm = {
-    name: "",
-    image: "/categories/pizza.svg",
-};
-
-export default function AdminCategoriesPage() {
-    const [categories, setCategories] = useState<AdminCategory[]>(adminCategories);
-    const [open, setOpen] = useState(false);
-    const [form, setForm] = useState<CategoryForm>(emptyForm);
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-        setForm((prev) => ({ ...prev, image: URL.createObjectURL(file) }));
-    };
-
-    const startAdd = () => {
-        setForm(emptyForm);
-        setOpen(true);
-    };
-
-    const startEdit = (category: AdminCategory) => {
-        setForm({ id: category.id, name: category.name, image: category.image });
-        setOpen(true);
-    };
-
-    const saveCategory = () => {
-        if (!form.name.trim()) return;
-
-        const nextCategory: AdminCategory = {
-            id: form.id ?? `cat-${Date.now()}`,
-            name: form.name,
-            image: form.image,
-            meals: form.id ? categories.find((item) => item.id === form.id)?.meals ?? 0 : 0,
-            status: "Active",
+type CategoryApiResponse = {
+    data: {
+        data: AdminCategory[];
+        meta: {
+            totalPages: number;
         };
-
-        setCategories((prev) => {
-            if (form.id) {
-                return prev.map((item) => (item.id === form.id ? nextCategory : item));
-            }
-            return [nextCategory, ...prev];
-        });
-
-        setOpen(false);
-        setForm(emptyForm);
     };
+};
 
-    const deleteCategory = (id: string) => {
-        setCategories((prev) => prev.filter((item) => item.id !== id));
-    };
+export default async function AdminCategoriesPage({ searchParams }: {
+    searchParams: Promise<{
+        page?: string;
+        searchTerm?: string;
+        sortBy?: string;
+        sortOrder?: "asc" | "desc";
+    }>;
+}) {
+    const resolvedSearchParams = await searchParams;
+    const currentPage = Math.max(1, Number(resolvedSearchParams.page ?? 1) || 1);
+
+    const categories = (await getCategories({
+        searchTerm: resolvedSearchParams.searchTerm,
+        skip: currentPage - 1,
+        sortBy: resolvedSearchParams.sortBy,
+        sortOrder: resolvedSearchParams.sortOrder,
+    })) as CategoryApiResponse;
+
+    const displayCategories = (categories.data?.data ?? []).map((cat) => ({
+        ...cat,
+        displayName: cat.name ?? "Unnamed Category",
+        displayImage: cat.image ?? cat.icon ?? "/categories/pizza.svg",
+        displayMeals: cat.meals ?? cat.mealsCount ?? 0,
+        displayStatus: cat.status ?? "Active",
+    }));
 
     return (
         <div className="space-y-6">
@@ -75,72 +62,88 @@ export default function AdminCategoriesPage() {
                     <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">Category Library</h1>
                 </div>
 
-                <Dialog open={open} onOpenChange={setOpen}>
+                <Dialog>
                     <DialogTrigger asChild>
-                        <Button onClick={startAdd} className="h-11 rounded-xl bg-orange-500 text-white hover:bg-orange-400">
+                        <Button className="h-11 rounded-xl bg-orange-500 text-white hover:bg-orange-400">
                             <Plus className="h-4 w-4" /> Add Category
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-lg">
-                        <DialogHeader>
-                            <DialogTitle>{form.id ? "Edit Category" : "Add Category"}</DialogTitle>
-                            <DialogDescription>Create or update a category name and image.</DialogDescription>
-                        </DialogHeader>
-
-                        <div className="space-y-4">
-                            <div>
-                                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Category Name</label>
-                                <Input value={form.name} onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))} className="h-11 rounded-xl bg-white dark:bg-slate-950" />
-                            </div>
-                            <div>
-                                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Image Upload</label>
-                                <div className="flex items-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
-                                    <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                                        <Upload className="h-4 w-4" /> Choose file
-                                        <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-                                    </label>
-                                    <div className="relative h-14 w-14 overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700">
-                                        <Image src={form.image} alt="Category preview" fill sizes="56px" className="object-cover" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <DialogFooter>
-                            <Button variant="outline" onClick={() => setOpen(false)} className="rounded-xl">Cancel</Button>
-                            <Button onClick={saveCategory} className="rounded-xl bg-orange-500 text-white hover:bg-orange-400">
-                                Save Category
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
                 </Dialog>
             </header>
 
-            <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {categories.map((category) => (
-                    <article key={category.id} className="overflow-hidden rounded-3xl border border-orange-200/70 bg-white/90 shadow-sm dark:border-orange-400/20 dark:bg-slate-900/90">
-                        <div className="relative h-40 w-full">
-                            <Image src={category.image} alt={category.name} fill sizes="(min-width: 1280px) 30vw, 50vw" className="object-cover" />
-                        </div>
-                        <div className="p-5">
-                            <div className="flex items-start justify-between gap-3">
-                                <div>
-                                    <h2 className="text-xl font-black text-slate-900 dark:text-slate-100">{category.name}</h2>
-                                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{category.meals} meals</p>
-                                </div>
-                                <span className={`rounded-full px-3 py-1 text-xs font-bold ${category.status === "Active" ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300" : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"}`}>
-                                    {category.status}
-                                </span>
-                            </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <Search placeholder="Search categories..." debounceWait={300} />
+                <SortingComponent
+                    className="h-12 rounded-2xl"
+                    label="Sort"
+                    options={[
+                        { label: "Name", value: "name" },
+                        { label: "Created At", value: "createdAt" },
+                    ]}
+                />
+            </div>
 
-                            <div className="mt-4 flex gap-2">
-                                <Button variant="outline" size="sm" onClick={() => startEdit(category)} className="rounded-xl"><Pencil className="h-4 w-4" /> Edit</Button>
-                                <Button variant="destructive" size="sm" onClick={() => deleteCategory(category.id)} className="rounded-xl"><Trash2 className="h-4 w-4" /> Delete</Button>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+                {displayCategories.length} categor{displayCategories.length === 1 ? "y" : "ies"} found
+            </p>
+
+            {displayCategories.length === 0 ? (
+                <div className="flex items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-12 text-center dark:border-slate-700 dark:bg-slate-950">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">No categories found.</p>
+                </div>
+            ) : (
+                <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    {displayCategories.map((category) => (
+                        <article key={category.id ?? category._id} className="overflow-hidden rounded-3xl border border-orange-200/70 bg-white/90 shadow-sm dark:border-orange-400/20 dark:bg-slate-900/90">
+                            <div className="relative h-40 w-full bg-slate-100 dark:bg-slate-800">
+                                <Image
+                                    src={category.displayImage}
+                                    alt={category.displayName}
+                                    fill
+                                    sizes="(min-width: 1280px) 30vw, 50vw"
+                                    className="object-cover"
+                                />
                             </div>
-                        </div>
-                    </article>
-                ))}
-            </section>
+                            <div className="p-5">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div>
+                                        <h2 className="text-xl font-black text-slate-900 dark:text-slate-100">{category.displayName}</h2>
+                                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{category.displayMeals} meals</p>
+                                    </div>
+                                    <span
+                                        className={`rounded-full px-3 py-1 text-xs font-bold ${
+                                            category.displayStatus === "Active"
+                                                ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
+                                                : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                                        }`}
+                                    >
+                                        {category.displayStatus}
+                                    </span>
+                                </div>
+
+                                <div className="mt-4 flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="rounded-xl"
+                                    >
+                                        <Pencil className="h-4 w-4" /> Edit
+                                    </Button>
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        className="rounded-xl"
+                                    >
+                                        <Trash2 className="h-4 w-4" /> Delete
+                                    </Button>
+                                </div>
+                            </div>
+                        </article>
+                    ))}
+                </section>
+            )}
+
+            <PaginationComponent totalPage={categories.data?.meta?.totalPages ?? 1} />
         </div>
     );
 }

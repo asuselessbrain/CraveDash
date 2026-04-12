@@ -35,6 +35,7 @@ type RawOrder = {
     id?: string;
     _id?: string;
     orderId?: string;
+    orderNumber?: string;
     createdAt?: string;
     orderStatus?: string;
     total?: number | string;
@@ -50,6 +51,7 @@ type RawOrder = {
 
 type UiOrder = {
     id: string;
+    displayId: string;
     date: string;
     customer: string;
     items: string;
@@ -138,9 +140,12 @@ function getItemNames(order: RawOrder): string[] {
 
 function normalizeOrder(order: RawOrder, index: number): UiOrder {
     const itemNames = getItemNames(order);
+    const apiId = order.id || order._id || order.orderId || `order-${index + 1}`;
+    const displayId = order.orderNumber || order.orderId || order.id || order._id || `order-${index + 1}`;
 
     return {
-        id: order.id || order.orderId || order._id || `order-${index + 1}`,
+        id: apiId,
+        displayId,
         date: formatDate(order.createdAt),
         customer: order.deliveryAddress?.fullName || order.userEmail || "Unknown customer",
         items: itemNames.length > 0 ? itemNames.join(", ") : "No items listed",
@@ -270,7 +275,7 @@ export default async function ProviderOrdersPage({ searchParams }: { searchParam
                         <tbody className="divide-y divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-900">
                             {orders.map((order) => (
                                 <tr key={order.id} className="align-middle hover:bg-slate-50 dark:hover:bg-slate-950/70">
-                                    <td className="px-4 py-4 font-semibold text-slate-900 dark:text-slate-100">{order.id}</td>
+                                    <td className="px-4 py-4 font-semibold text-slate-900 dark:text-slate-100">{order.displayId}</td>
                                     <td className="px-4 py-4 text-slate-600 dark:text-slate-300">{order.customer}</td>
                                     <td className="px-4 py-4 text-slate-600 dark:text-slate-300">{order.items}</td>
                                     <td className="px-4 py-4">

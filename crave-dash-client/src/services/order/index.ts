@@ -64,6 +64,11 @@ export const getProviderOrders = async (queryParams?: QueryParams) => {
   return result;
 };
 
+export const getProviderOrderById = async (orderId: string) => {
+  const result = await baseApi(`order/${orderId}`, "GET", undefined, undefined, "orders");
+  return result;
+};
+
 type UpdateProviderOrderStatusPayload = {
   orderStatus: "CONFIRMED" | "PREPARING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
 };

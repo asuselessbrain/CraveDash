@@ -6,5 +6,6 @@ import { DashboardController } from "./dashboard.controller";
 const router = express.Router();
 
 router.get("/customer", auth(Role.CUSTOMER), DashboardController.getCustomerDashboard);
+router.get("/provider", auth(Role.PROVIDER, Role.CUSTOMER, Role.ADMIN), DashboardController.getProviderDashboard);
 
 export const DashboardRoutes = router;
