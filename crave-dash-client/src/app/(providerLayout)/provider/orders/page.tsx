@@ -185,6 +185,8 @@ export default async function ProviderOrdersPage({ searchParams }: { searchParam
     const rawOrders: RawOrder[] = ordersResponse?.data?.data || [];
     const orders = rawOrders.map(normalizeOrder);
 
+    console.log(orders)
+
     const totalOrders = Number(ordersResponse?.data?.meta?.total ?? orders.length);
     const computedTotalPages = Math.ceil(totalOrders / limit);
     const apiTotalPages = ordersResponse?.data?.meta?.totalPages;
@@ -282,7 +284,6 @@ export default async function ProviderOrdersPage({ searchParams }: { searchParam
                                                 orderId={order.id}
                                                 options={orderStatusTransitions[order.status]}
                                                 action={updateOrderStatusAction}
-                                                formatStatus={formatStatus}
                                             />
                                         ) : (
                                             <span className="text-xs font-medium text-slate-400 dark:text-slate-500">No changes</span>

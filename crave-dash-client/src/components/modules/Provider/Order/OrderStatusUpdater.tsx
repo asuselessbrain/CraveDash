@@ -8,10 +8,13 @@ type OrderStatusUpdaterProps = {
   orderId: string;
   options: ProviderNextStatus[];
   action: (formData: FormData) => Promise<void>;
-  formatStatus: (status: ProviderNextStatus) => string;
 };
 
-export default function OrderStatusUpdater({ orderId, options, action, formatStatus }: OrderStatusUpdaterProps) {
+function formatStatusLabel(status: ProviderNextStatus): string {
+  return status.charAt(0) + status.slice(1).toLowerCase();
+}
+
+export default function OrderStatusUpdater({ orderId, options, action }: OrderStatusUpdaterProps) {
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
@@ -25,7 +28,7 @@ export default function OrderStatusUpdater({ orderId, options, action, formatSta
       >
         {options.map((nextStatus) => (
           <option key={nextStatus} value={nextStatus}>
-            {formatStatus(nextStatus)}
+            {formatStatusLabel(nextStatus)}
           </option>
         ))}
       </select>

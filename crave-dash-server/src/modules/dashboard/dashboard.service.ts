@@ -59,7 +59,7 @@ const getCustomerDashboard = async (userEmail: string) => {
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
 
-  const [customer, totalOrders, activeDeliveries, todayOrders, orderMealRows, recentOrders] =
+  const [customer, totalOrders, activeDeliveries, todayOrders, cartItems, recentOrders] =
     await Promise.all([
       prisma.customer.findUnique({
         where: { email: userEmail },
@@ -92,14 +92,12 @@ const getCustomerDashboard = async (userEmail: string) => {
           },
         },
       }),
-      prisma.orderItem.findMany({
+      prisma.cart.findMany({
         where: {
-          order: {
-            userEmail,
-          },
+          userEmail,
         },
         select: {
-          mealId: true,
+          quantity: true,
         },
       }),
       prisma.order.findMany({
@@ -126,7 +124,7 @@ const getCustomerDashboard = async (userEmail: string) => {
       }),
     ]);
 
-  const savedMeals = new Set(orderMealRows.map((row) => row.mealId)).size;
+  const savedMeals = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const rewardPoints = totalOrders * 20;
   const todayActivityCount = todayOrders + activeDeliveries;
 
