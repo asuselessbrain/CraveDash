@@ -40,6 +40,16 @@ const getProvidersOrders = catchAsync(async (req: AuthenticatedRequest, res: Res
   });
 });
 
+const getAdminOrders = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
+  const result = await OrderService.getAdminOrders(req.query);
+
+  res.status(200).json({
+    success: true,
+    message: "Admin orders retrieved successfully",
+    data: result,
+  });
+});
+
 const getOrderById = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
   const orderId = req.params.id as string;
   const result = await OrderService.getOrderById(orderId, req.user.email, req.user.role);
@@ -71,6 +81,7 @@ export const OrderController = {
   createOrder,
   getMyOrders,
   getProvidersOrders,
+  getAdminOrders,
   getOrderById,
   updateProviderOrderStatus,
 };

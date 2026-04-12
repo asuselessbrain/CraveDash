@@ -307,6 +307,114 @@ const getProvidersOrders = async (providerEmail: string, query: Record<string, u
   };
 };
 
+const getAdminOrders = async (query: Record<string, unknown>) => {
+  const { searchTerm, skip, take, sortBy, sortOrder } = query;
+  const allowedSortFields: Array<keyof Prisma.OrderOrderByWithRelationInput> = [
+    "id",
+    "userEmail",
+    "subtotal",
+    "deliveryFee",
+    "total",
+    "paymentMethod",
+    "paymentStatus",
+    "orderStatus",
+    "createdAt",
+    "updatedAt",
+  ];
+
+  const requestedSortField = typeof sortBy === "string" ? sortBy.trim() : "";
+  const safeSortBy = allowedSortFields.includes(
+    requestedSortField as keyof Prisma.OrderOrderByWithRelationInput,
+  )
+    ? requestedSortField
+    : "createdAt";
+
+  const whereCondition: Prisma.OrderWhereInput =
+    typeof searchTerm === "string" && searchTerm.trim().length > 0
+      ? {
+          OR: [
+            { id: { contains: searchTerm, mode: "insensitive" } },
+            { userEmail: { contains: searchTerm, mode: "insensitive" } },
+            { deliveryAddress: { fullName: { contains: searchTerm, mode: "insensitive" } } },
+            { deliveryAddress: { phoneNumber: { contains: searchTerm, mode: "insensitive" } } },
+            { deliveryAddress: { city: { contains: searchTerm, mode: "insensitive" } } },
+            { deliveryAddress: { area: { contains: searchTerm, mode: "insensitive" } } },
+            {
+              items: {
+                some: {
+                  meal: {
+                    providerEmail: {
+                      contains: searchTerm,
+                      mode: "insensitive",
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        }
+      : {};
+
+  const { currentPage, skipValue, takeValue, sortByField, sortOrderValue } = pagination(
+    Number(skip),
+    Number(take),
+    safeSortBy,
+    sortOrder === "asc" ? "asc" : "desc",
+  );
+
+  const orders = await prisma.order.findMany({
+    where: whereCondition,
+    skip: skipValue,
+    take: takeValue,
+    include: {
+      user: {
+        select: {
+          email: true,
+          role: true,
+          customer: {
+            select: {
+              fullName: true,
+            },
+          },
+        },
+      },
+      items: {
+        include: {
+          meal: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              price: true,
+              providerEmail: true,
+            },
+          },
+        },
+      },
+      deliveryAddress: true,
+    },
+    orderBy: {
+      [sortByField]: sortOrderValue,
+    },
+  });
+
+  const total = await prisma.order.count({
+    where: whereCondition,
+  });
+
+  const totalPages = Math.ceil(total / takeValue);
+
+  return {
+    meta: {
+      currentPage,
+      limit: takeValue,
+      total,
+      totalPages,
+    },
+    data: orders,
+  };
+};
+
 const getOrderById = async (orderId: string, userEmail: string, role: Role) => {
   const commonInclude: Prisma.OrderInclude = {
     items: {
@@ -479,10 +587,13 @@ const updateProviderOrderStatus = async (
   return updatedOrder;
 };
 
+
+
 export const OrderService = {
   createOrder,
   getMyOrders,
   getProvidersOrders,
+  getAdminOrders,
   getOrderById,
   updateProviderOrderStatus,
 };
