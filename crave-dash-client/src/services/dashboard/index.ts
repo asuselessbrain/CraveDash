@@ -10,3 +10,8 @@ export const providerDashboardData = async () => {
     const result = await baseApi(`dashboard/provider`, "GET", undefined, undefined, "dashboard");
     return result;
 }
+
+export const adminDashboardData = async () => {
+    const result = await baseApi(`dashboard/admin`, "GET", undefined, undefined, "dashboard");
+    return result;
+}

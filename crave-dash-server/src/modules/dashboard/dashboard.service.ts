@@ -1,4 +1,4 @@
-import { OrderStatus } from "../../../generated/prisma/enums";
+import { MealAvailabilityStatus, OrderStatus, Role, UserStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 
 type DashboardOrderStatusMeta = {
@@ -53,6 +53,17 @@ const formatDate = (value: Date) => {
     day: "numeric",
     year: "numeric",
   }).format(value);
+};
+
+const formatChartDay = (value: Date) => {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+  }).format(value);
+};
+
+const toNumber = (value: unknown) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
 };
 
 const getCustomerDashboard = async (userEmail: string) => {
@@ -441,7 +452,250 @@ const getProviderDashboard = async (providerEmail: string) => {
   };
 };
 
+const getAdminDashboard = async () => {
+  const today = new Date();
+  const startOfToday = new Date(today);
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const startOfWeek = new Date(startOfToday);
+  startOfWeek.setDate(startOfWeek.getDate() - 6);
+
+  const weekDays = Array.from({ length: 7 }, (_, index) => {
+    const day = new Date(startOfWeek);
+    day.setDate(startOfWeek.getDate() + index);
+    return day;
+  });
+
+  const [totalUsers, totalProviders, totalCustomers, totalOrders, totalRevenue, suspendedUsers, pendingOrders, unavailableMeals, recentOrders, weeklyRevenue, recentUsers] =
+    await Promise.all([
+      prisma.user.count(),
+      prisma.user.count({
+        where: {
+          role: Role.PROVIDER,
+        },
+      }),
+      prisma.user.count({
+        where: {
+          role: Role.CUSTOMER,
+        },
+      }),
+      prisma.order.count(),
+      prisma.order.aggregate({
+        _sum: {
+          total: true,
+        },
+      }),
+      prisma.user.count({
+        where: {
+          status: UserStatus.SUSPENDED,
+        },
+      }),
+      prisma.order.count({
+        where: {
+          orderStatus: OrderStatus.PENDING,
+        },
+      }),
+      prisma.meal.count({
+        where: {
+          availabilityStatus: MealAvailabilityStatus.UNAVAILABLE,
+        },
+      }),
+      prisma.order.findMany({
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 4,
+        include: {
+          user: {
+            select: {
+              email: true,
+              customer: {
+                select: {
+                  fullName: true,
+                },
+              },
+            },
+          },
+          items: {
+            include: {
+              meal: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+      prisma.order.findMany({
+        where: {
+          createdAt: {
+            gte: startOfWeek,
+          },
+        },
+        select: {
+          createdAt: true,
+          total: true,
+        },
+      }),
+      prisma.user.findMany({
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 4,
+        select: {
+          email: true,
+          role: true,
+          createdAt: true,
+          customer: {
+            select: {
+              fullName: true,
+            },
+          },
+        },
+      }),
+    ]);
+
+  const weeklyOrdersData = weekDays.map((day) => {
+    const dayStart = new Date(day);
+    dayStart.setHours(0, 0, 0, 0);
+
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+
+    const ordersForDay = weeklyRevenue.filter(
+      (order) => order.createdAt >= dayStart && order.createdAt < dayEnd,
+    ).length;
+
+    const revenueForDay = weeklyRevenue
+      .filter((order) => order.createdAt >= dayStart && order.createdAt < dayEnd)
+      .reduce((acc, order) => acc + toNumber(order.total), 0);
+
+    return {
+      label: formatChartDay(day),
+      orders: ordersForDay,
+      revenue: revenueForDay,
+      formattedRevenue: formatCurrency(revenueForDay),
+    };
+  });
+
+  const mappedRecentOrders = recentOrders.map((order) => {
+    const itemCount = order.items.reduce((acc, item) => acc + item.quantity, 0);
+    const customerName = order.user.customer?.fullName ?? order.user.email;
+    const status = order.orderStatus as keyof typeof OrderStatus;
+    const statusInfo = orderStatusMeta[status] ?? {
+      label: order.orderStatus,
+      tone: "neutral" as const,
+    };
+
+    return {
+      id: order.id,
+      orderNumber: `AO-${order.id.replace(/-/g, "").slice(0, 6).toUpperCase()}`,
+      customerName,
+      customerEmail: order.user.email,
+      itemCount,
+      total: toNumber(order.total),
+      formattedTotal: formatCurrency(toNumber(order.total)),
+      orderStatus: order.orderStatus,
+      statusLabel: statusInfo.label,
+      statusTone: statusInfo.tone,
+      createdAt: order.createdAt,
+      dateLabel: formatDate(order.createdAt),
+    };
+  });
+
+  const recentActivity = recentUsers.map((user) => ({
+    label: user.customer?.fullName ?? user.email,
+    description: `${user.role} • ${formatDate(user.createdAt)}`,
+    email: user.email,
+    role: user.role,
+    createdAt: user.createdAt,
+  }));
+
+  const totalRevenueValue = toNumber(totalRevenue._sum.total);
+  const systemIsHealthy = suspendedUsers === 0 && pendingOrders < 20 && unavailableMeals < 10;
+
+  return {
+    greeting: {
+      title: "Platform Overview",
+      subtitle: "Monitor the marketplace, track performance, and review live activity across users, orders, and providers.",
+    },
+    sidebar: {
+      label: "System Status",
+      status: systemIsHealthy ? "Healthy" : "Needs Attention",
+      description: systemIsHealthy ? "All services operational" : "Some areas need review",
+    },
+    overviewCards: [
+      {
+        key: "totalUsers",
+        label: "Total Users",
+        value: totalUsers,
+        formattedValue: String(totalUsers),
+        description: "All registered accounts",
+      },
+      {
+        key: "totalOrders",
+        label: "Total Orders",
+        value: totalOrders,
+        formattedValue: String(totalOrders),
+        description: "All marketplace orders",
+      },
+      {
+        key: "totalProviders",
+        label: "Total Providers",
+        value: totalProviders,
+        formattedValue: String(totalProviders),
+        description: "Active service providers",
+      },
+      {
+        key: "totalRevenue",
+        label: "Total Revenue",
+        value: totalRevenueValue,
+        formattedValue: formatCurrency(totalRevenueValue),
+        description: "Gross platform revenue",
+      },
+    ],
+    metrics: {
+      totalCustomers,
+      suspendedUsers,
+      pendingOrders,
+      unavailableMeals,
+    },
+    charts: {
+      weeklyOrders: weeklyOrdersData.map((day) => ({
+        label: day.label,
+        value: day.orders,
+      })),
+      weeklyRevenue: weeklyOrdersData.map((day) => ({
+        label: day.label,
+        value: day.revenue,
+        formattedValue: day.formattedRevenue,
+      })),
+    },
+    recentActivity: mappedRecentOrders,
+    recentUsers: recentActivity,
+    quickActions: [
+      {
+        label: "Manage Users",
+        href: "/users",
+        icon: "users",
+      },
+      {
+        label: "Manage Orders",
+        href: "/orders",
+        icon: "orders",
+      },
+      {
+        label: "Manage Categories",
+        href: "/categories",
+        icon: "categories",
+      },
+    ],
+  };
+};
+
 export const DashboardService = {
   getCustomerDashboard,
   getProviderDashboard,
+  getAdminDashboard,
 };
