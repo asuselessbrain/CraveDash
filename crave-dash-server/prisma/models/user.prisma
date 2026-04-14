@@ -11,6 +11,8 @@ model User {
     carts     cart[]
     meals     Meal[]
     orders    Order[]
+    cuisines  Cuisine[]   @relation("ProviderCuisines")
+    categories Category[] @relation("ProviderCategories")
 
     @@map("users")
 }

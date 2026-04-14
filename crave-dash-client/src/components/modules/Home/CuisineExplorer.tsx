@@ -39,35 +39,41 @@ export default function CuisineExplorer({ items }: { items?: Cuisine[] }) {
 					</h2>
 				</div>
 
-				<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-				{cuisines.map((cuisine) => (
-					<Link
-						key={cuisine.id}
-						href={`/meals?cuisine=${cuisine.slug || toSlug(cuisine.name)}`}
-						className="group relative aspect-4/5 overflow-hidden rounded-3xl border border-white/60 shadow-md shadow-black/10 sm:aspect-3/4"
-					>
-						<Image
-							src={cuisine.image}
-							alt={`${cuisine.name} cuisine`}
-							fill
-							sizes="(min-width: 1280px) 24vw, (min-width: 640px) 48vw, 100vw"
-							className="object-cover transition duration-500 group-hover:scale-110"
-						/>
+				{cuisines.length === 0 ? (
+					<div className="rounded-2xl border border-dashed border-slate-300 bg-white/80 p-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-300">
+						No cuisines available in the database yet.
+					</div>
+				) : (
+					<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+					{cuisines.map((cuisine) => (
+						<Link
+							key={cuisine.id}
+							href={`/meals?cuisine=${cuisine.slug || toSlug(cuisine.name)}`}
+							className="group relative aspect-4/5 overflow-hidden rounded-3xl border border-white/60 shadow-md shadow-black/10 sm:aspect-3/4"
+						>
+							<Image
+								src={cuisine.image}
+								alt={`${cuisine.name} cuisine`}
+								fill
+								sizes="(min-width: 1280px) 24vw, (min-width: 640px) 48vw, 100vw"
+								className="object-cover transition duration-500 group-hover:scale-110"
+							/>
 
-						<div className="absolute inset-0 bg-linear-to-t from-black/78 via-black/38 to-black/10" />
+							<div className="absolute inset-0 bg-linear-to-t from-black/78 via-black/38 to-black/10" />
 
-						<div className="absolute inset-x-0 bottom-0 p-4 text-white">
-							<h3 className="text-xl font-bold tracking-tight">{cuisine.name}</h3>
-							<p className="mt-1 text-sm text-white/85">{cuisine.dishes || "Explore dishes"}</p>
+							<div className="absolute inset-x-0 bottom-0 p-4 text-white">
+								<h3 className="text-xl font-bold tracking-tight">{cuisine.name}</h3>
+								<p className="mt-1 text-sm text-white/85">{cuisine.dishes || "Explore dishes"}</p>
 
-							<div className="mt-3 max-h-0 overflow-hidden rounded-xl bg-white/15 p-0 text-sm backdrop-blur-sm transition-all duration-300 group-hover:max-h-24 group-hover:p-3">
-								<p className="font-semibold">Popular:</p>
-								<p className="mt-1 text-white/90">{cuisine.samples.join(" • ")}</p>
+								<div className="mt-3 max-h-0 overflow-hidden rounded-xl bg-white/15 p-0 text-sm backdrop-blur-sm transition-all duration-300 group-hover:max-h-24 group-hover:p-3">
+									<p className="font-semibold">Popular:</p>
+									<p className="mt-1 text-white/90">{cuisine.samples.join(" • ")}</p>
+								</div>
 							</div>
-						</div>
-					</Link>
-				))}
-				</div>
+						</Link>
+					))}
+					</div>
+				)}
 			</div>
 		</section>
 	);

@@ -1,6 +1,7 @@
 export type ProviderOrderStatus = "Placed" | "Preparing" | "Ready" | "Delivered" | "Cancelled";
 export type MealStatus = "Active" | "Paused";
 export type ProviderCategoryStatus = "ACTIVE" | "INACTIVE";
+export type ProviderCuisineStatus = "ACTIVE" | "INACTIVE";
 
 export type ProviderDashboardStats = {
     totalOrders: number;
@@ -59,7 +60,7 @@ export type ProviderCuisine = {
     mealsCount?: number;
     categories?: number;
     categoriesCount?: number;
-    status?: string
+    status?: ProviderCuisineStatus;
 };
 
 export const providerStats: ProviderDashboardStats = {

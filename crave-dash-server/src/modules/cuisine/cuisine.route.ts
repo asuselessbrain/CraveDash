@@ -1,10 +1,13 @@
 import express from "express";
 import { CuisineController } from "./cuisine.controller";
+import auth from "../../middleware/auth";
+import { Role } from "../../../generated/prisma/enums";
 
 const router = express.Router();
 
-router.post("/", CuisineController.createCuisine)
+router.post("/", auth(Role.PROVIDER, Role.ADMIN), CuisineController.createCuisine)
 router.get("/", CuisineController.getCuisines)
 router.get("/filtering", CuisineController.getAllCuisinesForFiltering)
+router.patch("/:id", auth(Role.PROVIDER, Role.ADMIN), CuisineController.updateCuisine)
 
 export const CuisineRoutes = router;

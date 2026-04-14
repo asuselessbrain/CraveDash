@@ -1,4 +1,5 @@
 "use server"
+import { ProviderCuisineStatus } from "@/app/(providerLayout)/provider/data";
 import { QueryParams } from "@/types";
 import { baseApi } from "../baseApi"
 import { revalidateTag } from "next/cache";
@@ -21,6 +22,12 @@ export const getCuisines = async (queryParams?: QueryParams) => {
     }
 
     const result = await baseApi("cuisine", "GET", undefined, params.toString(), "cuisines")
+    return result;
+}
+
+export const updateCuisine = async (id: string, data: { name?: string, image?: string, status?: ProviderCuisineStatus }) => {
+    const result = await baseApi(`cuisine/${id}`, "PATCH", data, undefined, "cuisines")
+    revalidateTag("cuisines", "max")
     return result;
 }
 

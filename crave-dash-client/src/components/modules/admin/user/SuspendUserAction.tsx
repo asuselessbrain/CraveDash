@@ -3,10 +3,8 @@ import { Button } from "@/components/ui/button";
 import { blockUserByAdmin } from "@/services/user";
 import { ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 export default function SuspendUserAction({ id, status }: { id: string; status: "Active" | "Suspended" }) {
-    const router = useRouter();
 
     const toggleBlockAction = async () => {
         if (status !== "Active") return;

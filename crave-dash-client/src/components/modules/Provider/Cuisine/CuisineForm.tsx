@@ -3,7 +3,7 @@ import { ProviderCuisine } from '@/app/(providerLayout)/provider/data'
 import { Button } from '@/components/ui/button'
 import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { createCuisine } from '@/services/cuisine'
+import { createCuisine, updateCuisine } from '@/services/cuisine'
 import { Loader2, Upload } from 'lucide-react'
 import Image from 'next/image'
 import React, { useState } from 'react'
@@ -22,10 +22,21 @@ const emptyForm: CuisineForm = {
 };
 
 
-export default function CuisineForm() {
-    const [form, setForm] = useState<CuisineForm>(emptyForm);
+type CuisineFormProps = {
+    initialData?: CuisineForm;
+};
+
+
+export default function CuisineForm({ initialData }: CuisineFormProps) {
+    const [form, setForm] = useState<CuisineForm>(initialData ? {
+        id: initialData.id,
+        name: initialData.name,
+        image: initialData.image || emptyForm.image,
+    } : emptyForm);
     const [isUploading, setIsUploading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const isEditMode = Boolean(form.id);
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -47,23 +58,30 @@ export default function CuisineForm() {
     const saveCuisine = async () => {
         if (!form.name.trim()) return;
 
-        const nextCuisine: ProviderCuisine = {
+        const nextCuisineData: ProviderCuisine = {
             name: form.name,
             image: form.image
         };
 
         setIsSubmitting(true);
         try {
-            const result = await createCuisine(nextCuisine)
+            const result = isEditMode && form.id
+                ? await updateCuisine(form.id, nextCuisineData)
+                : await createCuisine(nextCuisineData)
+
+                console.log(result)
+
             if (result?.success) {
-                toast.success(result.message || "Cuisine saved successfully!");
-                setForm(emptyForm);
+                toast.success(result.message || (isEditMode ? "Cuisine updated successfully!" : "Cuisine saved successfully!"));
+                if (!isEditMode) {
+                    setForm(emptyForm);
+                }
                 return;
             }
 
-            toast.error(result?.errorMessage || "Failed to save cuisine. Please try again.");
+            toast.error(result?.errorMessage || (isEditMode ? "Failed to update cuisine. Please try again." : "Failed to save cuisine. Please try again."));
         } catch {
-            toast.error("Something went wrong while saving cuisine.");
+            toast.error(isEditMode ? "Something went wrong while updating cuisine." : "Something went wrong while saving cuisine.");
         } finally {
             setIsSubmitting(false);
         }
@@ -74,7 +92,7 @@ export default function CuisineForm() {
     return (
         <DialogContent className="max-w-[calc(100%-1rem)] sm:max-w-lg">
             <DialogHeader>
-                <DialogTitle>{form.id ? "Edit Cuisine" : "Add New Cuisine"}</DialogTitle>
+                <DialogTitle>{isEditMode ? "Edit Cuisine" : "Add New Cuisine"}</DialogTitle>
                 <DialogDescription>Create or update a cuisine type with a name and image.</DialogDescription>
             </DialogHeader>
 
@@ -113,7 +131,7 @@ export default function CuisineForm() {
                                 <Loader2 className="h-4 w-4 animate-spin" /> Saving...
                             </>
                         ) : (
-                            "Save Cuisine"
+                            isEditMode ? "Update Cuisine" : "Save Cuisine"
                         )}
                     </Button>
                 </DialogClose>

@@ -1,18 +1,15 @@
-"use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { BadgePercent, LayoutDashboard, LogOut, PackageOpen, Shapes, Users } from "lucide-react";
+import { BadgePercent } from "lucide-react";
+import Logout from "@/components/modules/shared/Logout";
+import NavBar, { type NavigationItem } from "@/components/modules/admin/navBar/NavBar";
 
 const navigation = [
-    { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/users", label: "Manage Users", icon: Users },
-    { href: "/admin/orders", label: "Manage Orders", icon: PackageOpen },
-    { href: "/admin/categories", label: "Manage Categories", icon: Shapes },
-];
+    { href: "/admin", label: "Dashboard", icon: "dashboard" },
+    { href: "/admin/users", label: "Manage Users", icon: "users" },
+    { href: "/admin/orders", label: "Manage Orders", icon: "orders" },
+    { href: "/admin/categories", label: "Manage Categories", icon: "categories" },
+] satisfies NavigationItem[];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-    const pathname = usePathname();
 
     return (
         <div className="min-h-screen bg-linear-to-br from-slate-100 via-orange-50/40 to-slate-100 text-slate-900 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 dark:text-slate-100">
@@ -28,22 +25,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         </div>
                     </div>
 
-                    <nav className="mt-6 grid gap-2 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1">
-                        {navigation.map((item) => {
-                            const Icon = item.icon;
-                            const active = pathname === item.href;
-                            return (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${active ? "border-orange-500 bg-linear-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-500/20" : "border-slate-200 bg-white text-slate-700 hover:-translate-y-0.5 hover:border-orange-300 hover:bg-orange-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:border-orange-500/30 dark:hover:bg-orange-500/10"}`}
-                                >
-                                    <Icon className="h-4 w-4" />
-                                    {item.label}
-                                </Link>
-                            );
-                        })}
-                    </nav>
+                    <NavBar navigation={navigation} />
 
                     <div className="mt-6 rounded-2xl border border-slate-200 bg-linear-to-br from-white to-emerald-50/40 p-4 dark:border-slate-800 dark:from-slate-950 dark:to-slate-900">
                         <p className="text-xs font-semibold tracking-widest text-slate-500 uppercase dark:text-slate-400">System Status</p>
@@ -52,13 +34,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </div>
 
                     <div className="mt-6 pt-2 lg:mt-auto">
-                        <Link
-                            href="/sign-in"
-                            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 dark:border-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
-                        >
-                            <LogOut className="h-4 w-4" />
-                            Logout
-                        </Link>
+                        <Logout />
                     </div>
                 </aside>
 

@@ -147,6 +147,9 @@ const getAllCuisinesForCategory = async () => {
 
 const getAllCuisinesForFiltering = async () => {
     const result = await prisma.cuisine.findMany({
+        where: {
+            status: "ACTIVE",
+        },
         include: {
             _count: {
                 select: {
@@ -158,11 +161,20 @@ const getAllCuisinesForFiltering = async () => {
     return await attachCuisineCounts(result);
 };
 
-// const updateCui
+const updateCuisine = async (cuisineId: string, payload: Prisma.CuisineUpdateInput) => {
+    const result = await prisma.cuisine.update({
+        where: {
+            id: cuisineId,
+        },
+        data: payload,
+    })
+    return result;
+}
 
 export const CuisineService = {
     createCuisine,
     getCuisines,
     getAllCuisinesForCategory,
-    getAllCuisinesForFiltering
+    getAllCuisinesForFiltering,
+    updateCuisine
 }

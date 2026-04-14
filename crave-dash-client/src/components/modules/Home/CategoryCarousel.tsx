@@ -5,7 +5,8 @@ import { getCategoryForSlider } from "@/services/category";
 
 export default async function CategoryCarousel() {
   const categories = await getCategoryForSlider();
-  const loopedCategories = [...categories.data, ...categories.data, ...categories.data, ...categories.data, ...categories.data, ...categories.data, ...categories.data]; // Loop categories to create a seamless marquee effect
+  const categoryItems = categories.data ?? [];
+  const loopedCategories = [...categoryItems, ...categoryItems, ...categoryItems, ...categoryItems, ...categoryItems, ...categoryItems, ...categoryItems]; // Loop categories to create a seamless marquee effect
   return (
     <section className="mx-auto mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="overflow-hidden rounded-[2.25rem] border border-orange-200/70 bg-linear-to-br from-orange-50 via-amber-50 to-rose-50 p-6 shadow-lg shadow-orange-500/10 sm:p-8 lg:p-10 dark:border-orange-400/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
@@ -15,6 +16,11 @@ export default async function CategoryCarousel() {
           </h2>
         </div>
 
+        {categoryItems.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white/80 p-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-300">
+            No categories available in the database yet.
+          </div>
+        ) : (
         <div className="group relative overflow-hidden py-2">
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-linear-to-r from-orange-50 to-transparent dark:from-slate-900" />
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-linear-to-l from-rose-50 to-transparent dark:from-slate-800" />
@@ -46,6 +52,7 @@ export default async function CategoryCarousel() {
             ))}
           </div>
         </div>
+        )}
       </div>
     </section>
   );
