@@ -25,6 +25,21 @@ export const getCuisines = async (queryParams?: QueryParams) => {
     return result;
 }
 
+export const getProviderCuisines = async (queryParams?: QueryParams) => {
+    const params = new URLSearchParams();
+
+    if (queryParams) {
+        Object.entries(queryParams).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== "") {
+                params.append(key, String(value));
+            }
+        });
+    }
+
+    const result = await baseApi("cuisine/provider", "GET", undefined, params.toString(), "cuisines")
+    return result;
+}
+
 export const updateCuisine = async (id: string, data: { name?: string, image?: string, status?: ProviderCuisineStatus }) => {
     const result = await baseApi(`cuisine/${id}`, "PATCH", data, undefined, "cuisines")
     revalidateTag("cuisines", "max")

@@ -132,8 +132,49 @@ const getCuisines = async (query: Record<string, unknown>) => {
     };
 };
 
-const getAllCuisinesForCategory = async () => {
+const getProviderAllCuisines = async (providerEmail: string, query: Record<string, unknown>) => {
+
+    const { searchTerm, skip, take, sortBy, sortOrder, status } = query;
+    const allowedSortFields: Array<keyof Prisma.CuisineOrderByWithRelationInput> = [
+        "id",
+        "name",
+        "image",
+        "status",
+        "createdAt",
+        "updatedAt",
+    ];
+
+    const requestedSortField = typeof sortBy === "string" ? sortBy.trim() : "";
+    const safeSortBy = allowedSortFields.includes(requestedSortField as keyof Prisma.CuisineOrderByWithRelationInput)
+        ? requestedSortField
+        : "createdAt";
+
+    let inputFilter: Prisma.CuisineWhereInput[] = [];
+
+    if (searchTerm) {
+        inputFilter = searching(inputFilter, ["name"], String(searchTerm));
+    }
+
+    // Apply additional field filtering
+    const filterData: Record<string, any> = {};
+    if (status) filterData.status = status;
+
+    if (Object.keys(filterData).length > 0) {
+        inputFilter = filtering(inputFilter, filterData) as Prisma.CuisineWhereInput[];
+    }
+
+    const { currentPage, skipValue, takeValue, sortByField, sortOrderValue } =
+        pagination(Number(skip), Number(take), safeSortBy, sortOrder === "asc" ? "asc" : "desc");
+
+    const whereCondition: Prisma.CuisineWhereInput = {
+        providerEmail,
+        ...(inputFilter.length > 0 ? { AND: inputFilter } : {}),
+    };
+
     const result = await prisma.cuisine.findMany({
+        where: whereCondition,
+        skip: skipValue,
+        take: takeValue,
         include: {
             _count: {
                 select: {
@@ -141,9 +182,29 @@ const getAllCuisinesForCategory = async () => {
                 },
             },
         },
-    })
-    return await attachCuisineCounts(result);
-}
+        orderBy: {
+            [sortByField]: sortOrderValue
+        }
+    });
+
+    const mappedResult = await attachCuisineCounts(result);
+
+    const total = await prisma.cuisine.count({
+        where: whereCondition,
+    });
+
+    const totalPages = Math.ceil(total / takeValue);
+
+    return {
+        meta: {
+            currentPage,
+            limit: takeValue,
+            total,
+            totalPages,
+        },
+        data: mappedResult,
+    };
+};
 
 const getAllCuisinesForFiltering = async () => {
     const result = await prisma.cuisine.findMany({
@@ -174,7 +235,7 @@ const updateCuisine = async (cuisineId: string, payload: Prisma.CuisineUpdateInp
 export const CuisineService = {
     createCuisine,
     getCuisines,
-    getAllCuisinesForCategory,
+    getProviderAllCuisines,
     getAllCuisinesForFiltering,
     updateCuisine
 }

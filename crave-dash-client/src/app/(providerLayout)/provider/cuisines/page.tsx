@@ -6,7 +6,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import CuisineForm from "@/components/modules/Provider/Cuisine/CuisineForm";
 import Search from "@/components/modules/shared/SearchComponent";
 import SortingComponent from "@/components/modules/shared/SortingComponent";
-import { getCuisines, updateCuisine } from "@/services/cuisine";
+import { getCuisines, getProviderCuisines, updateCuisine } from "@/services/cuisine";
 import { ProviderCuisine } from "../data";
 import Image from "next/image";
 import PaginationComponent from "@/components/modules/shared/PaginationComponent";
@@ -53,7 +53,7 @@ export default async function ProviderCuisinesPage({searchParams}: {
 const resolvedSearchParams = await searchParams;
 const currentPage = Math.max(1, Number(resolvedSearchParams.page ?? 1) || 1);
 
-const cuisines = await getCuisines({
+const cuisines = await getProviderCuisines({
         searchTerm: resolvedSearchParams.searchTerm,
     skip: currentPage - 1,
         status: resolvedSearchParams.status,

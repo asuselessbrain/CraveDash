@@ -48,9 +48,22 @@ const updateCuisine = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
+const getProviderAllCuisines = catchAsync(async (req: Request & { user?: { email: string } }, res: Response) => {
+
+    const providerEmail = req.user?.email as string;
+    const result = await CuisineService.getProviderAllCuisines(providerEmail, req.query);
+
+    res.status(200).json({
+        success: true,
+        message: "Cuisines retrieved successfully",
+        data: result
+    })
+})
+
 export const CuisineController = {
     createCuisine,
     getCuisines,
     getAllCuisinesForFiltering,
-    updateCuisine
+    updateCuisine,
+    getProviderAllCuisines
 }
