@@ -19,10 +19,10 @@ export default async function CategoryCarousel() {
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-linear-to-r from-orange-50 to-transparent dark:from-slate-900" />
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-linear-to-l from-rose-50 to-transparent dark:from-slate-800" />
 
-          <div className="category-marquee-track group-hover:[animation-play-state:paused]">
+          <div className="category-marquee-track group-hover:paused">
             {loopedCategories.map((category, index) => (
               <Link
-                key={`${category.id}`}
+                key={`${category.id}-${index}`}
                 href={`/browse?category=${category.id}`}
                 className="group/card relative flex min-w-40 shrink-0 items-center gap-3 rounded-2xl border border-white/70 bg-white/90 p-2 text-slate-700 transition duration-300 hover:-translate-y-1 hover:border-orange-300 hover:bg-white hover:text-orange-700 hover:shadow-xl hover:shadow-orange-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 sm:min-w-52 dark:border-slate-700 dark:bg-slate-900/95 dark:text-slate-200 dark:hover:border-orange-400/70 dark:hover:bg-slate-900 dark:hover:text-orange-200"
               >

@@ -7,7 +7,7 @@ import { ShoppingCart, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Deal = {
-  id: number;
+  id: string;
   name: string;
   image: string;
   originalPrice: number;
@@ -15,9 +15,9 @@ type Deal = {
   discountPercent: number;
 };
 
-const flashDeals: Deal[] = [
+const fallbackFlashDeals: Deal[] = [
   {
-    id: 1,
+    id: "1",
     name: "Smoky Pepperoni Pizza",
     image: "/categories/pizza.svg",
     originalPrice: 15.99,
@@ -25,7 +25,7 @@ const flashDeals: Deal[] = [
     discountPercent: 31,
   },
   {
-    id: 2,
+    id: "2",
     name: "Double Cheese Burger",
     image: "/categories/burger.svg",
     originalPrice: 12.49,
@@ -33,7 +33,7 @@ const flashDeals: Deal[] = [
     discountPercent: 32,
   },
   {
-    id: 3,
+    id: "3",
     name: "Chef Special Biryani",
     image: "/categories/biryani.svg",
     originalPrice: 13.99,
@@ -41,7 +41,7 @@ const flashDeals: Deal[] = [
     discountPercent: 29,
   },
   {
-    id: 4,
+    id: "4",
     name: "Hot Garlic Noodles",
     image: "/categories/chinese.svg",
     originalPrice: 11.49,
@@ -49,7 +49,7 @@ const flashDeals: Deal[] = [
     discountPercent: 30,
   },
   {
-    id: 5,
+    id: "5",
     name: "Chocolate Dessert Box",
     image: "/categories/desserts.svg",
     originalPrice: 9.99,
@@ -57,7 +57,7 @@ const flashDeals: Deal[] = [
     discountPercent: 35,
   },
   {
-    id: 6,
+    id: "6",
     name: "Summer Fruit Cooler",
     image: "/categories/drinks.svg",
     originalPrice: 7.49,
@@ -79,8 +79,9 @@ function formatTime(value: number) {
   return String(value).padStart(2, "0");
 }
 
-export default function FlashDeals() {
+export default function FlashDeals({ deals }: { deals?: Deal[] }) {
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
+  const flashDeals = deals?.length ? deals : fallbackFlashDeals;
 
   const dealDeadline = useMemo(() => getDealDeadline(), []);
 

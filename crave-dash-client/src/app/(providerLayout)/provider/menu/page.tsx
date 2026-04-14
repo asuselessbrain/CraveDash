@@ -52,13 +52,16 @@ export default async function ProviderMenuPage({
                     <SearchComponent placeholder="Search meals by name..." />
                     <SortingComponent
                         options={[
-                            { label: "Name", value: "name" },
-                            { label: "Price", value: "price" },
-                            { label: "Meal Type", value: "mealType" },
-                            { label: "Created At", value: "createdAt" },
+                            { label: "Name Asc", sortBy: "name", sortOrder: "asc" },
+                            { label: "Name Desc", sortBy: "name", sortOrder: "desc" },
+                            { label: "Price Low", sortBy: "price", sortOrder: "asc" },
+                            { label: "Price High", sortBy: "price", sortOrder: "desc" },
+                            { label: "Meal Type Asc", sortBy: "mealType", sortOrder: "asc" },
+                            { label: "Meal Type Desc", sortBy: "mealType", sortOrder: "desc" },
+                            { label: "Created Oldest", sortBy: "createdAt", sortOrder: "asc" },
+                            { label: "Created Newest", sortBy: "createdAt", sortOrder: "desc" },
                         ]}
                         label="Sort By"
-                        defaultSortBy="name"
                     />
                 </div>
 

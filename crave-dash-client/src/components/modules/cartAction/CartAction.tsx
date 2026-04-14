@@ -111,13 +111,13 @@ export default function CartAction({ cartItems }: { cartItems: CartItemsPayload 
                                 key={item.id}
                                 className="flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 dark:border-slate-700 dark:bg-slate-900/90 sm:flex-row sm:items-center sm:justify-between"
                             >
-                                <div className="flex items-center gap-3">
+                                <div className="flex min-w-0 items-center gap-3">
                                     <div className="relative h-18 w-18 overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700">
                                         <Image src={item.meal.image} alt={item.meal.name} fill sizes="72px" className="object-cover" />
                                     </div>
-                                    <div>
-                                        <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">{item.meal.name}</h3>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400">{item.meal.provider}</p>
+                                    <div className="min-w-0">
+                                        <h3 className="truncate text-base font-bold text-slate-900 dark:text-slate-100">{item.meal.name}</h3>
+                                        <p className="truncate text-sm text-slate-500 dark:text-slate-400">{item.meal.provider}</p>
                                         <p className="mt-1 text-sm font-semibold text-orange-600 dark:text-orange-300">${item.meal.price}</p>
                                     </div>
                                 </div>

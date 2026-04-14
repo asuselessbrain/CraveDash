@@ -4,6 +4,7 @@ import { prisma } from "../../lib/prisma";
 import AppError from "../../errors/appError";
 import { pagination } from "../../utils/pagination";
 import { searching } from "../../utils/searching";
+import { filtering } from "../../utils/filtering";
 
 type CreateOrderPayload = {
   fullName?: string;
@@ -119,7 +120,7 @@ const createOrder = async (payload: CreateOrderPayload, userEmail: string) => {
 };
 
 const getMyOrders = async (userEmail: string, query: Record<string, unknown>) => {
-  const { searchTerm, skip, take, sortBy, sortOrder } = query;
+  const { searchTerm, skip, take, sortBy, sortOrder, orderStatus, status, paymentStatus, paymentMethod } = query;
   const allowedSortFields: Array<keyof Prisma.OrderOrderByWithRelationInput> = [
     "id",
     "userEmail",
@@ -146,12 +147,23 @@ const getMyOrders = async (userEmail: string, query: Record<string, unknown>) =>
     },
   ];
 
+  // Apply text search filtering
   if (searchTerm) {
     inputFilter = searching(
       inputFilter,
       ["id", "deliveryAddress.fullName", "deliveryAddress.phoneNumber", "deliveryAddress.city", "deliveryAddress.area"],
       String(searchTerm),
     ) as Prisma.OrderWhereInput[];
+  }
+
+  // Apply additional field filtering
+  const filterData: Record<string, any> = {};
+  if (orderStatus || status) filterData.orderStatus = orderStatus ?? status;
+  if (paymentStatus) filterData.paymentStatus = paymentStatus;
+  if (paymentMethod) filterData.paymentMethod = paymentMethod;
+
+  if (Object.keys(filterData).length > 0) {
+    inputFilter = filtering(inputFilter, filterData) as Prisma.OrderWhereInput[];
   }
 
   const { currentPage, skipValue, takeValue, sortByField, sortOrderValue } = pagination(
@@ -161,10 +173,10 @@ const getMyOrders = async (userEmail: string, query: Record<string, unknown>) =>
     sortOrder === "asc" ? "asc" : "desc",
   );
 
+  const whereCondition: Prisma.OrderWhereInput = inputFilter.length > 0 ? { AND: inputFilter } : {};
+
   const orders = await prisma.order.findMany({
-    where: {
-      AND: inputFilter,
-    },
+    where: whereCondition,
     skip: skipValue,
     take: takeValue,
     include: {
@@ -189,9 +201,7 @@ const getMyOrders = async (userEmail: string, query: Record<string, unknown>) =>
   });
 
   const total = await prisma.order.count({
-    where: {
-      AND: inputFilter,
-    },
+    where: whereCondition,
   });
 
   const totalPages = Math.ceil(total / takeValue);
@@ -208,7 +218,7 @@ const getMyOrders = async (userEmail: string, query: Record<string, unknown>) =>
 };
 
 const getProvidersOrders = async (providerEmail: string, query: Record<string, unknown>) => {
-  const { searchTerm, skip, take, sortBy, sortOrder } = query;
+  const { searchTerm, skip, take, sortBy, sortOrder, orderStatus, status, paymentStatus, paymentMethod } = query;
   const allowedSortFields: Array<keyof Prisma.OrderOrderByWithRelationInput> = [
     "id",
     "userEmail",
@@ -241,12 +251,23 @@ const getProvidersOrders = async (providerEmail: string, query: Record<string, u
     },
   ];
 
+  // Apply text search filtering
   if (searchTerm) {
     inputFilter = searching(
       inputFilter,
       ["id", "deliveryAddress.fullName", "deliveryAddress.phoneNumber", "deliveryAddress.city", "deliveryAddress.area", "userEmail"],
       String(searchTerm),
     ) as Prisma.OrderWhereInput[];
+  }
+
+  // Apply additional field filtering
+  const filterData: Record<string, any> = {};
+  if (orderStatus || status) filterData.orderStatus = orderStatus ?? status;
+  if (paymentStatus) filterData.paymentStatus = paymentStatus;
+  if (paymentMethod) filterData.paymentMethod = paymentMethod;
+
+  if (Object.keys(filterData).length > 0) {
+    inputFilter = filtering(inputFilter, filterData) as Prisma.OrderWhereInput[];
   }
 
   const { currentPage, skipValue, takeValue, sortByField, sortOrderValue } = pagination(
@@ -256,10 +277,10 @@ const getProvidersOrders = async (providerEmail: string, query: Record<string, u
     sortOrder === "asc" ? "asc" : "desc",
   );
 
+  const whereCondition: Prisma.OrderWhereInput = inputFilter.length > 0 ? { AND: inputFilter } : {};
+
   const orders = await prisma.order.findMany({
-    where: {
-      AND: inputFilter,
-    },
+    where: whereCondition,
     skip: skipValue,
     take: takeValue,
     include: {
@@ -289,9 +310,7 @@ const getProvidersOrders = async (providerEmail: string, query: Record<string, u
   });
 
   const total = await prisma.order.count({
-    where: {
-      AND: inputFilter,
-    },
+    where: whereCondition,
   });
 
   const totalPages = Math.ceil(total / takeValue);
@@ -308,7 +327,7 @@ const getProvidersOrders = async (providerEmail: string, query: Record<string, u
 };
 
 const getAdminOrders = async (query: Record<string, unknown>) => {
-  const { searchTerm, skip, take, sortBy, sortOrder } = query;
+  const { searchTerm, skip, take, sortBy, sortOrder, orderStatus, status, paymentStatus, paymentMethod, userEmail, providerEmail } = query;
   const allowedSortFields: Array<keyof Prisma.OrderOrderByWithRelationInput> = [
     "id",
     "userEmail",
@@ -329,31 +348,30 @@ const getAdminOrders = async (query: Record<string, unknown>) => {
     ? requestedSortField
     : "createdAt";
 
-  const whereCondition: Prisma.OrderWhereInput =
-    typeof searchTerm === "string" && searchTerm.trim().length > 0
-      ? {
-          OR: [
-            { id: { contains: searchTerm, mode: "insensitive" } },
-            { userEmail: { contains: searchTerm, mode: "insensitive" } },
-            { deliveryAddress: { fullName: { contains: searchTerm, mode: "insensitive" } } },
-            { deliveryAddress: { phoneNumber: { contains: searchTerm, mode: "insensitive" } } },
-            { deliveryAddress: { city: { contains: searchTerm, mode: "insensitive" } } },
-            { deliveryAddress: { area: { contains: searchTerm, mode: "insensitive" } } },
-            {
-              items: {
-                some: {
-                  meal: {
-                    providerEmail: {
-                      contains: searchTerm,
-                      mode: "insensitive",
-                    },
-                  },
-                },
-              },
-            },
-          ],
-        }
-      : {};
+  let inputFilter: Prisma.OrderWhereInput[] = [];
+
+  // Apply text search filtering
+  if (searchTerm) {
+    inputFilter = searching(
+      inputFilter,
+      ["id", "userEmail", "deliveryAddress.fullName", "deliveryAddress.phoneNumber", "deliveryAddress.city", "deliveryAddress.area"],
+      String(searchTerm),
+    ) as Prisma.OrderWhereInput[];
+  }
+
+  // Apply additional field filtering
+  const filterData: Record<string, any> = {};
+  if (orderStatus || status) filterData.orderStatus = orderStatus ?? status;
+  if (paymentStatus) filterData.paymentStatus = paymentStatus;
+  if (paymentMethod) filterData.paymentMethod = paymentMethod;
+  if (userEmail) filterData.userEmail = userEmail;
+  if (providerEmail) {
+    filterData["items.some.meal.providerEmail"] = providerEmail;
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    inputFilter = filtering(inputFilter, filterData) as Prisma.OrderWhereInput[];
+  }
 
   const { currentPage, skipValue, takeValue, sortByField, sortOrderValue } = pagination(
     Number(skip),
@@ -361,6 +379,8 @@ const getAdminOrders = async (query: Record<string, unknown>) => {
     safeSortBy,
     sortOrder === "asc" ? "asc" : "desc",
   );
+
+  const whereCondition: Prisma.OrderWhereInput = inputFilter.length > 0 ? { AND: inputFilter } : {};
 
   const orders = await prisma.order.findMany({
     where: whereCondition,

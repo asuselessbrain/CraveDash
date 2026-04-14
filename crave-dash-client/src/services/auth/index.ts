@@ -1,6 +1,7 @@
 "use server"
 import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
+import { jwtDecode } from "jwt-decode";
 
 const cookieOptions = {
   httpOnly: true,
@@ -13,7 +14,7 @@ export const signInUser = async (data: FieldValues) => {
   const cookieStore = await cookies()
   try {
     const res = await fetch(
-      "http://localhost:5000/api/v1/auth/login",
+      "https://crave-dash-beta.vercel.app/api/v1/auth/login",
       {
         method: "POST",
         headers: {
@@ -36,10 +37,9 @@ export const signInUser = async (data: FieldValues) => {
 
 export const signUpUser = async (data: FieldValues) => {
   const cookieStore = await cookies()
-  console.log(data)
   try {
     const res = await fetch(
-      "http://localhost:5000/api/v1/user/customers",
+      "https://crave-dash-beta.vercel.app/api/v1/user/customers",
       {
         method: "POST",
         headers: {
@@ -53,7 +53,6 @@ export const signUpUser = async (data: FieldValues) => {
     if (result.success) {
       cookieStore.set("token", result.data.token, cookieOptions)
     }
-    console.log(result)
     return result;
   }
   catch (error) {
@@ -65,7 +64,7 @@ export const signUpUser = async (data: FieldValues) => {
 export const forgotPassword = async (email: FieldValues) => {
   try {
     const res = await fetch(
-      "http://localhost:5000/api/v1/auth/forgot-password",
+      "https://crave-dash-beta.vercel.app/api/v1/auth/forgot-password",
       {
         method: "PATCH",
         headers: {
@@ -75,7 +74,6 @@ export const forgotPassword = async (email: FieldValues) => {
       }
     );
     const result = await res.json();
-    console.log(result)
     return result;
   } catch (error) {
     console.error("Error resetting password:", error);
@@ -86,7 +84,7 @@ export const forgotPassword = async (email: FieldValues) => {
 export const resetPassword = async (data: FieldValues) => {
   try {
     const res = await fetch(
-      "http://localhost:5000/api/v1/auth/reset-password",
+      "https://crave-dash-beta.vercel.app/api/v1/auth/reset-password",
       {
         method: "PATCH",
         headers: {
@@ -102,3 +100,28 @@ export const resetPassword = async (data: FieldValues) => {
     throw error;
   }
 }
+
+export const signOutUser = async () => {
+  const cookieStore = await cookies()
+  cookieStore.delete("token")
+}
+
+type UserRole = "CUSTOMER" | "PROVIDER" | "ADMIN";
+
+interface IUser {
+  email: string;
+  role: UserRole;
+  exp: number;
+  iat: number;
+}
+
+export const getCurrentUser = async () => {
+  try {
+    const accessToken = (await cookies()).get("token")?.value || "";
+    if (!accessToken) return null;
+
+    return jwtDecode<IUser>(accessToken);
+  } catch {
+    return null;
+  }
+};

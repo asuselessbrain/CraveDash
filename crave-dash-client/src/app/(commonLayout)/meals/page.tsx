@@ -70,22 +70,29 @@ function normalizeMeal(rawMeal: ApiMeal, index: number): MealCard {
     };
 }
 
-export default async function MealsPage({ searchParams }: { searchParams: Promise<{ searchTerm?: string; sortBy?: string; sortOrder?: string; page?: string }> }) {
+export default async function MealsPage({ searchParams }: { searchParams: Promise<{ searchTerm?: string; category?: string; cuisine?: string; sortBy?: string; sortOrder?: string; page?: string }> }) {
 
     const resolvedSearchParams = await searchParams;
-    const page = resolvedSearchParams.page ? Number(resolvedSearchParams.page) : 1;
+    const page = Math.max(1, Number(resolvedSearchParams.page ?? 1) || 1);
     const limit = 12;
-    const skip = (page - 1);
+    const skip = page - 1;
 
 
     const mealsResponse = await getMeals({
         searchTerm: resolvedSearchParams.searchTerm,
+        category: resolvedSearchParams.category,
+        cuisine: resolvedSearchParams.cuisine,
+        categoryId: resolvedSearchParams.category,
+        cuisineId: resolvedSearchParams.cuisine,
         sortBy: resolvedSearchParams.sortBy || "name",
         sortOrder: (resolvedSearchParams.sortOrder as "asc" | "desc") || "asc",
         skip,
         take: limit,
     });
     const meals = mealsResponse?.data?.data || mealsResponse?.data || [];
+    const normalizedMeals: MealCard[] = Array.isArray(meals)
+        ? meals.map((meal, index) => normalizeMeal(meal as ApiMeal, index))
+        : [];
 
     const categoryResponse = await getCategoryForSlider();
     const categories = categoryResponse.data;
@@ -94,8 +101,12 @@ export default async function MealsPage({ searchParams }: { searchParams: Promis
 
     const cuisines = cuisineResponse.data;
 
-
-    const mealCount = mealsResponse.data.meta.total;
+    const mealMeta = mealsResponse?.data?.meta ?? {
+        total: normalizedMeals.length,
+        limit,
+        currentPage: page,
+        totalPages: 1,
+    };
 
 
     return (
@@ -108,15 +119,7 @@ export default async function MealsPage({ searchParams }: { searchParams: Promis
                         Discover signature dishes from nearby providers. Each meal card shows quick details so you can pick faster.
                     </p>
                 </header>
-
-                {mealCount === 0 ? (
-                    <div className="landing-reveal-delay-2 rounded-2xl border border-slate-200 bg-white/85 p-12 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900/85">
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">No meals available right now</h2>
-                        <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Please check back later after providers publish menu items.</p>
-                    </div>
-                ) : (
-                    <MealsCatalog meals={meals} meta={mealsResponse.data.meta} categories={categories} cuisines={cuisines} />
-                )}
+                <MealsCatalog meals={normalizedMeals} meta={mealMeta} categories={categories} cuisines={cuisines} />
             </div>
         </main>
     );

@@ -67,7 +67,6 @@ function formatAmount(value?: number | string): string {
 export default async function ProviderDashboardPage() {
     const providerDashboardResponse = (await providerDashboardData()) as DashboardResponse;
     const dashboardData = providerDashboardResponse?.data;
-    console.log(dashboardData)
 
     const greetingTitle = dashboardData?.greeting?.title ?? "Business Overview";
     const greetingSubtitle =
@@ -122,7 +121,7 @@ export default async function ProviderDashboardPage() {
                         </Button>
                     </div>
 
-                    <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700">
+                    <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
                         <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
                             <thead className="bg-slate-50 dark:bg-slate-950">
                                 <tr className="text-left text-xs font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">

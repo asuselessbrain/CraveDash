@@ -2,6 +2,7 @@ import { Prisma } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 import { pagination } from "../../utils/pagination";
 import { searching } from "../../utils/searching";
+import { filtering } from "../../utils/filtering";
 
 const mealInclude = {
     category: {
@@ -23,7 +24,7 @@ const createMeal = async (payload: Prisma.MealUncheckedCreateInput, email: strin
 };
 
 const getProvidersMeals = async (query: Record<string, unknown>) => {
-    const { searchTerm, skip, take, sortBy, sortOrder } = query;
+    const { searchTerm, skip, take, sortBy, sortOrder, availabilityStatus, mealType, dietaryTag, spiceLevel, categoryId, cuisineId } = query;
     const allowedSortFields: Array<keyof Prisma.MealOrderByWithRelationInput> = [
         "id",
         "name",
@@ -52,13 +53,26 @@ const getProvidersMeals = async (query: Record<string, unknown>) => {
         inputFilter = searching(inputFilter, ["name", "description", "category.name", "category.cuisine.name"], String(searchTerm));
     }
 
+    // Apply additional field filtering
+    const filterData: Record<string, any> = {};
+    if (availabilityStatus) filterData.availabilityStatus = availabilityStatus;
+    if (mealType) filterData.mealType = mealType;
+    if (dietaryTag) filterData.dietaryTag = dietaryTag;
+    if (spiceLevel) filterData.spiceLevel = spiceLevel;
+    if (categoryId) filterData.categoryId = categoryId;
+    if (cuisineId) filterData["category.cuisine.id"] = cuisineId;
+
+    if (Object.keys(filterData).length > 0) {
+        inputFilter = filtering(inputFilter, filterData) as Prisma.MealWhereInput[];
+    }
+
     const { currentPage, skipValue, takeValue, sortByField, sortOrderValue } =
         pagination(Number(skip), Number(take), safeSortBy, sortOrder === "asc" ? "asc" : "desc");
 
+    const whereCondition: Prisma.MealWhereInput = inputFilter.length > 0 ? { AND: inputFilter } : {};
+
     const result = await prisma.meal.findMany({
-        where: {
-            AND: inputFilter,
-        },
+        where: whereCondition,
         skip: skipValue,
         take: takeValue,
         orderBy: {
@@ -68,9 +82,7 @@ const getProvidersMeals = async (query: Record<string, unknown>) => {
     });
 
     const total = await prisma.meal.count({
-        where: {
-            AND: inputFilter,
-        },
+        where: whereCondition,
     });
 
     const totalPages = Math.ceil(total / takeValue);
@@ -87,7 +99,7 @@ const getProvidersMeals = async (query: Record<string, unknown>) => {
 };
 
 const getMeals = async (query: Record<string, unknown>) => {
-    const { searchTerm, skip, take, sortBy, sortOrder } = query;
+    const { searchTerm, skip, take, sortBy, sortOrder, availabilityStatus, mealType, dietaryTag, spiceLevel, categoryId, cuisineId, providerEmail } = query;
     const allowedSortFields: Array<keyof Prisma.MealOrderByWithRelationInput> = [
         "id",
         "name",
@@ -116,13 +128,27 @@ const getMeals = async (query: Record<string, unknown>) => {
         inputFilter = searching(inputFilter, ["name", "description", "category.name", "category.cuisine.name"], String(searchTerm));
     }
 
+    // Apply additional field filtering
+    const filterData: Record<string, any> = {};
+    if (availabilityStatus) filterData.availabilityStatus = availabilityStatus;
+    if (mealType) filterData.mealType = mealType;
+    if (dietaryTag) filterData.dietaryTag = dietaryTag;
+    if (spiceLevel) filterData.spiceLevel = spiceLevel;
+    if (categoryId) filterData.categoryId = categoryId;
+    if (cuisineId) filterData["category.cuisine.id"] = cuisineId;
+    if (providerEmail) filterData.providerEmail = providerEmail;
+
+    if (Object.keys(filterData).length > 0) {
+        inputFilter = filtering(inputFilter, filterData) as Prisma.MealWhereInput[];
+    }
+
     const { currentPage, skipValue, takeValue, sortByField, sortOrderValue } =
         pagination(Number(skip), Number(take), safeSortBy, sortOrder === "asc" ? "asc" : "desc");
 
+    const whereCondition: Prisma.MealWhereInput = inputFilter.length > 0 ? { AND: inputFilter } : {};
+
     const result = await prisma.meal.findMany({
-        where: {
-            AND: inputFilter,
-        },
+        where: whereCondition,
         skip: skipValue,
         take: takeValue,
         orderBy: {
@@ -132,9 +158,7 @@ const getMeals = async (query: Record<string, unknown>) => {
     });
 
     const total = await prisma.meal.count({
-        where: {
-            AND: inputFilter,
-        },
+        where: whereCondition,
     });
 
     const totalPages = Math.ceil(total / takeValue);

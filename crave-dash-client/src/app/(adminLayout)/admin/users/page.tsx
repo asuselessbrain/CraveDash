@@ -157,8 +157,10 @@ export default async function AdminUsersPage({
                     className="h-12 rounded-2xl"
                     label="Sort"
                     options={[
-                        { label: "Name", value: "name" },
-                        { label: "Join Date", value: "createdAt" },
+                        { label: "Name Asc", sortBy: "name", sortOrder: "asc" },
+                        { label: "Name Desc", sortBy: "name", sortOrder: "desc" },
+                        { label: "Joined Oldest", sortBy: "createdAt", sortOrder: "asc" },
+                        { label: "Joined Newest", sortBy: "createdAt", sortOrder: "desc" },
                     ]}
                 />
             </div>
@@ -184,7 +186,7 @@ export default async function AdminUsersPage({
                     {users.length} user{users.length === 1 ? "" : "s"} found
                 </p>
 
-                <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700">
+                <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
                     <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
                         <thead className="bg-slate-50 dark:bg-slate-950">
                             <tr className="text-left text-xs font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">

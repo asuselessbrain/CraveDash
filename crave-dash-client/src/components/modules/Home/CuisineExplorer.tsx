@@ -2,82 +2,34 @@ import Image from "next/image";
 import Link from "next/link";
 
 type Cuisine = {
-	id: number;
-	slug: string;
+	id: string;
+	slug?: string;
 	name: string;
 	image: string;
-	dishes: string;
+	dishes?: string;
 	samples: string[];
 };
 
-const cuisines: Cuisine[] = [
-	{
-		id: 1,
-		slug: "italian",
-		name: "Italian",
-		image: "/cuisines/italian.svg",
-		dishes: "120+ dishes",
-		samples: ["Margherita Pizza", "Creamy Alfredo Pasta"],
-	},
-	{
-		id: 2,
-		slug: "chinese",
-		name: "Chinese",
-		image: "/cuisines/chinese.svg",
-		dishes: "95+ dishes",
-		samples: ["Szechuan Noodles", "Kung Pao Chicken"],
-	},
-	{
-		id: 3,
-		slug: "indian",
-		name: "Indian",
-		image: "/cuisines/indian.svg",
-		dishes: "140+ dishes",
-		samples: ["Butter Chicken", "Kacchi Biryani"],
-	},
-	{
-		id: 4,
-		slug: "japanese",
-		name: "Japanese",
-		image: "/cuisines/japanese.svg",
-		dishes: "70+ dishes",
-		samples: ["Salmon Sushi", "Chicken Ramen"],
-	},
-	{
-		id: 5,
-		slug: "mexican",
-		name: "Mexican",
-		image: "/cuisines/mexican.svg",
-		dishes: "80+ dishes",
-		samples: ["Loaded Tacos", "Burrito Bowl"],
-	},
-	{
-		id: 6,
-		slug: "thai",
-		name: "Thai",
-		image: "/cuisines/thai.svg",
-		dishes: "65+ dishes",
-		samples: ["Pad Thai", "Tom Yum Soup"],
-	},
-	{
-		id: 7,
-		slug: "korean",
-		name: "Korean",
-		image: "/cuisines/korean.svg",
-		dishes: "58+ dishes",
-		samples: ["Kimchi Fried Rice", "Bulgogi Beef"],
-	},
-	{
-		id: 8,
-		slug: "mediterranean",
-		name: "Mediterranean",
-		image: "/cuisines/mediterranean.svg",
-		dishes: "76+ dishes",
-		samples: ["Chicken Shawarma", "Falafel Plate"],
-	},
-];
+function toSlug(value: string) {
+	return value
+		.toLowerCase()
+		.trim()
+		.replace(/[^a-z0-9\s-]/g, "")
+		.replace(/\s+/g, "-")
+		.replace(/-+/g, "-");
+}
 
-export default function CuisineExplorer() {
+function getDishesCount(value?: string) {
+	if (!value) return 0;
+	const match = value.match(/\d+/);
+	if (!match) return 0;
+	return Number(match[0]) || 0;
+}
+
+export default function CuisineExplorer({ items }: { items?: Cuisine[] }) {
+	const cuisines = (items?.length ? items : [])
+		.slice()
+		.sort((a, b) => getDishesCount(b.dishes) - getDishesCount(a.dishes));
 	return (
 		<section className="mx-auto mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
 			<div className="overflow-hidden rounded-[2.25rem] border border-orange-200/70 bg-linear-to-br from-orange-50 via-amber-50 to-rose-50 p-6 shadow-lg shadow-orange-500/10 sm:p-8 lg:p-10 dark:border-orange-400/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
@@ -91,8 +43,8 @@ export default function CuisineExplorer() {
 				{cuisines.map((cuisine) => (
 					<Link
 						key={cuisine.id}
-						href={`/browse?cuisine=${cuisine.slug}`}
-						className="group relative aspect-[4/5] overflow-hidden rounded-3xl border border-white/60 shadow-md shadow-black/10 sm:aspect-[3/4]"
+						href={`/meals?cuisine=${cuisine.slug || toSlug(cuisine.name)}`}
+						className="group relative aspect-4/5 overflow-hidden rounded-3xl border border-white/60 shadow-md shadow-black/10 sm:aspect-3/4"
 					>
 						<Image
 							src={cuisine.image}
@@ -106,7 +58,7 @@ export default function CuisineExplorer() {
 
 						<div className="absolute inset-x-0 bottom-0 p-4 text-white">
 							<h3 className="text-xl font-bold tracking-tight">{cuisine.name}</h3>
-							<p className="mt-1 text-sm text-white/85">{cuisine.dishes}</p>
+							<p className="mt-1 text-sm text-white/85">{cuisine.dishes || "Explore dishes"}</p>
 
 							<div className="mt-3 max-h-0 overflow-hidden rounded-xl bg-white/15 p-0 text-sm backdrop-blur-sm transition-all duration-300 group-hover:max-h-24 group-hover:p-3">
 								<p className="font-semibold">Popular:</p>

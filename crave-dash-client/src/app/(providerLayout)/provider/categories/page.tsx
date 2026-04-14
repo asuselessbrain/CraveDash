@@ -1,4 +1,5 @@
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import CategoryForm from "@/components/modules/Provider/Category/CategoryForm";
@@ -33,6 +34,33 @@ type CategoryCuisineOption = {
     _id?: string;
     name: string;
 };
+
+const statusFilters: Array<{ label: string; value?: string }> = [
+    { label: "All" },
+    { label: "Active", value: "ACTIVE" },
+    { label: "Inactive", value: "INACTIVE" },
+];
+
+function buildStatusHref(params: {
+    searchTerm?: string;
+    status?: string;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+}, status?: string): string {
+    const query = new URLSearchParams();
+
+    if (params.searchTerm) query.set("searchTerm", params.searchTerm);
+    if (params.sortBy) query.set("sortBy", params.sortBy);
+    if (params.sortOrder) query.set("sortOrder", params.sortOrder);
+    query.set("page", "1");
+
+    if (status) {
+        query.set("status", status);
+    }
+
+    const queryString = query.toString();
+    return queryString ? `?${queryString}` : "?";
+}
 
 
 export default async function ProviderCategoriesPage({ searchParams }: {
@@ -88,10 +116,34 @@ export default async function ProviderCategoriesPage({ searchParams }: {
                     className="h-12 rounded-2xl"
                     label="Sort"
                     options={[
-                        { label: "Name", value: "name" },
-                        { label: "Created At", value: "createdAt" },
+                        { label: "Name Asc", sortBy: "name", sortOrder: "asc" },
+                        { label: "Name Desc", sortBy: "name", sortOrder: "desc" },
+                        { label: "Created Oldest", sortBy: "createdAt", sortOrder: "asc" },
+                        { label: "Created Newest", sortBy: "createdAt", sortOrder: "desc" },
                     ]}
                 />
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+                {statusFilters.map((statusFilter) => {
+                    const currentStatus = resolvedSearchParams.status?.toUpperCase();
+                    const isActive =
+                        (statusFilter.value && statusFilter.value === currentStatus) ||
+                        (!statusFilter.value && !currentStatus);
+
+                    return (
+                        <Link
+                            key={statusFilter.label}
+                            href={buildStatusHref(resolvedSearchParams, statusFilter.value)}
+                            className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition ${isActive
+                                ? "border-orange-500 bg-orange-500 text-white"
+                                : "border-slate-200 bg-white text-slate-700 hover:border-orange-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300"
+                                }`}
+                        >
+                            {statusFilter.label}
+                        </Link>
+                    );
+                })}
             </div>
 
             <p className="text-sm text-slate-500 dark:text-slate-400">

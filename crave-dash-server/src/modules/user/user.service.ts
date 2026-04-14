@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 import { StringValue } from "ms";
 import AppError from "../../errors/appError";
 import { pagination } from "../../utils/pagination";
+import { filtering } from "../../utils/filtering";
 
 type AdminCreateUserPayload = {
   email: string;
@@ -23,6 +24,12 @@ type AdminUpdateUserPayload = {
 };
 
 const createCustomer = async (data: CustomerInput) => {
+  const role = data.role ?? Role.CUSTOMER;
+
+  if (role === Role.ADMIN) {
+    throw new AppError(403, "Admin account cannot be created from public registration");
+  }
+
   const hashedPassword = await bcrypt.hash(
     data.password,
     Number(config.saltRounds),
@@ -32,7 +39,7 @@ const createCustomer = async (data: CustomerInput) => {
   const useData = {
     email: data.email,
     password: data.password,
-    role: Role.CUSTOMER,
+    role,
   };
 
   const customerData = {
@@ -40,14 +47,14 @@ const createCustomer = async (data: CustomerInput) => {
     fullName: data.fullName,
     phone: data.phoneNumber ?? null,
   };
+  await prisma.user.create({ data: useData });
 
-
-
-  const user = await prisma.user.create({ data: useData });
-
-  const customer = await prisma.customer.create({
-    data: customerData,
-  });
+  const customer =
+    role === Role.CUSTOMER
+      ? await prisma.customer.create({
+          data: customerData,
+        })
+      : null;
 
 
   const token = jwt.sign(
@@ -56,7 +63,11 @@ const createCustomer = async (data: CustomerInput) => {
     { expiresIn: config.jwt.expiresIn as StringValue },
   );
 
-  return { ...customer, token };
+  return {
+    ...(customer ?? { email: data.email, fullName: data.fullName }),
+    role: useData.role,
+    token,
+  };
 };
 
 const getAdminUsers = async (query: Record<string, unknown>) => {
@@ -78,14 +89,15 @@ const getAdminUsers = async (query: Record<string, unknown>) => {
     ? requestedSortField
     : "createdAt";
 
-  const inputFilter: Prisma.UserWhereInput[] = [];
+  let inputFilter: Prisma.UserWhereInput[] = [];
 
-  if (typeof role === "string" && Object.values(Role).includes(role as Role)) {
-    inputFilter.push({ role: role as Role });
-  }
+  // Apply additional field filtering
+  const filterData: Record<string, any> = {};
+  if (role) filterData.role = role;
+  if (status) filterData.status = status;
 
-  if (typeof status === "string" && Object.values(UserStatus).includes(status as UserStatus)) {
-    inputFilter.push({ status: status as UserStatus });
+  if (Object.keys(filterData).length > 0) {
+    inputFilter = filtering(inputFilter, filterData) as Prisma.UserWhereInput[];
   }
 
   if (typeof searchTerm === "string" && searchTerm.trim().length > 0) {
@@ -105,10 +117,10 @@ const getAdminUsers = async (query: Record<string, unknown>) => {
     sortOrder === "asc" ? "asc" : "desc",
   );
 
+  const whereCondition: Prisma.UserWhereInput = inputFilter.length > 0 ? { AND: inputFilter } : {};
+
   const users = await prisma.user.findMany({
-    where: {
-      AND: inputFilter,
-    },
+    where: whereCondition,
     skip: skipValue,
     take: takeValue,
     select: {
@@ -146,9 +158,7 @@ const getAdminUsers = async (query: Record<string, unknown>) => {
   }));
 
   const total = await prisma.user.count({
-    where: {
-      AND: inputFilter,
-    },
+    where: whereCondition,
   });
 
   const totalPages = Math.ceil(total / takeValue);

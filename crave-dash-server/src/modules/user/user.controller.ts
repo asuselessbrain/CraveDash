@@ -20,7 +20,7 @@ const createCustomer = catchAsync(async (req: Request, res: Response) => {
 
     res.status(201).json({
         success: true,
-        message: "Customer created successfully",
+        message: "User created successfully",
         data: {
             token, userData
         }

@@ -27,7 +27,7 @@ export const baseApi = async (
     }
 
     const result = await fetch(
-        `http://localhost:5000/api/v1/${endpoint}${normalizedQuery}`,
+        `https://crave-dash-beta.vercel.app/api/v1/${endpoint}${normalizedQuery}`,
         options
     );
     return await result.json();

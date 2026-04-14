@@ -17,6 +17,8 @@ type CategoryOption = {
     name: string;
     cuisineId?: string;
     cuisine?: string;
+    meals?: number;
+    mealsCount?: number;
 };
 
 type MealType = "BREAKFAST" | "LUNCH" | "DINNER";
@@ -331,9 +333,10 @@ export default function MenuForm({
                         </option>
                         {categoryOptions.map((category) => {
                             const categoryId = getCategoryId(category);
+                            const mealCount = Number(category.mealsCount ?? category.meals ?? 0) || 0;
                             return (
                                 <option key={categoryId} value={categoryId}>
-                                    {category.name}
+                                    {category.name} ({mealCount} meals)
                                 </option>
                             );
                         })}

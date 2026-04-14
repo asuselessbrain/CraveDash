@@ -8,7 +8,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
@@ -19,14 +18,13 @@ type SortOrder = 'asc' | 'desc';
 
 type SortOption = {
   label: string;
-  value: string;
+  sortBy: string;
+  sortOrder: SortOrder;
 };
 
 interface SortingComponentProps {
   options: SortOption[];
   label?: string;
-  defaultSortBy?: string;
-  defaultSortOrder?: SortOrder;
   sortByKey?: string;
   sortOrderKey?: string;
   pageKey?: string;
@@ -36,8 +34,6 @@ interface SortingComponentProps {
 export default function SortingComponent({
   options,
   label = 'Sort',
-  defaultSortBy,
-  defaultSortOrder = 'asc',
   sortByKey = 'sortBy',
   sortOrderKey = 'sortOrder',
   pageKey = 'page',
@@ -49,17 +45,19 @@ export default function SortingComponent({
 
   if (!options.length) return null;
 
-  const activeSortBy = searchParams.get(sortByKey) ?? defaultSortBy ?? options[0].value;
-  const activeSortOrder =
-    (searchParams.get(sortOrderKey) as SortOrder | null) ?? defaultSortOrder;
+  const activeSortBy = searchParams.get(sortByKey);
+  const activeSortOrder = searchParams.get(sortOrderKey) as SortOrder | null;
 
-  const activeOption = options.find((option) => option.value === activeSortBy) ?? options[0];
+  const activeOption =
+    activeSortBy && activeSortOrder
+      ? options.find((option) => option.sortBy === activeSortBy && option.sortOrder === activeSortOrder)
+      : undefined;
 
-  const updateSort = (nextSortBy: string, nextSortOrder: SortOrder) => {
+  const updateSort = (nextOption: SortOption) => {
     const params = new URLSearchParams(searchParams);
 
-    params.set(sortByKey, nextSortBy);
-    params.set(sortOrderKey, nextSortOrder);
+    params.set(sortByKey, nextOption.sortBy);
+    params.set(sortOrderKey, nextOption.sortOrder);
     params.set(pageKey, '1');
 
     const query = params.toString();
@@ -82,33 +80,27 @@ export default function SortingComponent({
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className={className}>
           <ArrowUpDown className="h-4 w-4" />
-          {label}: {activeOption.label} ({activeSortOrder.toUpperCase()})
+          {label}{activeOption ? `: ${activeOption.label}` : ''}
           <ChevronDown className="h-4 w-4 opacity-70" />
         </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-64">
-        <DropdownMenuLabel>Sort Field</DropdownMenuLabel>
         <DropdownMenuRadioGroup
-          value={activeSortBy}
-          onValueChange={(nextSortBy) => updateSort(nextSortBy, activeSortOrder)}
+          value={activeOption ? `${activeOption.sortBy}:${activeOption.sortOrder}` : ''}
+          onValueChange={(nextValue) => {
+            const selectedOption = options.find((option) => `${option.sortBy}:${option.sortOrder}` === nextValue);
+
+            if (selectedOption) {
+              updateSort(selectedOption);
+            }
+          }}
         >
           {options.map((option) => (
-            <DropdownMenuRadioItem key={option.value} value={option.value}>
+            <DropdownMenuRadioItem key={`${option.sortBy}:${option.sortOrder}`} value={`${option.sortBy}:${option.sortOrder}`}>
               {option.label}
             </DropdownMenuRadioItem>
           ))}
-        </DropdownMenuRadioGroup>
-
-        <DropdownMenuSeparator />
-
-        <DropdownMenuLabel>Order</DropdownMenuLabel>
-        <DropdownMenuRadioGroup
-          value={activeSortOrder}
-          onValueChange={(nextSortOrder) => updateSort(activeSortBy, nextSortOrder as SortOrder)}
-        >
-          <DropdownMenuRadioItem value="asc">Ascending</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="desc">Descending</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
 
         <DropdownMenuSeparator />

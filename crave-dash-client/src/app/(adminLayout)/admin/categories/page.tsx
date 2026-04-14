@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
@@ -28,13 +29,38 @@ type CategoryApiResponse = {
     };
 };
 
+type SearchParams = {
+    page?: string;
+    searchTerm?: string;
+    status?: string;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+};
+
+const statusFilters: Array<{ label: string; value?: string }> = [
+    { label: "All" },
+    { label: "Active", value: "ACTIVE" },
+    { label: "Inactive", value: "INACTIVE" },
+];
+
+function buildStatusHref(current: SearchParams, status?: string): string {
+    const params = new URLSearchParams();
+
+    if (current.searchTerm) params.set("searchTerm", current.searchTerm);
+    if (current.sortBy) params.set("sortBy", current.sortBy);
+    if (current.sortOrder) params.set("sortOrder", current.sortOrder);
+    params.set("page", "1");
+
+    if (status) {
+        params.set("status", status);
+    }
+
+    const query = params.toString();
+    return query ? `?${query}` : "?";
+}
+
 export default async function AdminCategoriesPage({ searchParams }: {
-    searchParams: Promise<{
-        page?: string;
-        searchTerm?: string;
-        sortBy?: string;
-        sortOrder?: "asc" | "desc";
-    }>;
+    searchParams: Promise<SearchParams>;
 }) {
     const resolvedSearchParams = await searchParams;
     const currentPage = Math.max(1, Number(resolvedSearchParams.page ?? 1) || 1);
@@ -42,6 +68,7 @@ export default async function AdminCategoriesPage({ searchParams }: {
     const categories = (await getCategories({
         searchTerm: resolvedSearchParams.searchTerm,
         skip: currentPage - 1,
+        status: resolvedSearchParams.status,
         sortBy: resolvedSearchParams.sortBy,
         sortOrder: resolvedSearchParams.sortOrder,
     })) as CategoryApiResponse;
@@ -77,10 +104,34 @@ export default async function AdminCategoriesPage({ searchParams }: {
                     className="h-12 rounded-2xl"
                     label="Sort"
                     options={[
-                        { label: "Name", value: "name" },
-                        { label: "Created At", value: "createdAt" },
+                        { label: "Name Asc", sortBy: "name", sortOrder: "asc" },
+                        { label: "Name Desc", sortBy: "name", sortOrder: "desc" },
+                        { label: "Created Oldest", sortBy: "createdAt", sortOrder: "asc" },
+                        { label: "Created Newest", sortBy: "createdAt", sortOrder: "desc" },
                     ]}
                 />
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+                {statusFilters.map((statusFilter) => {
+                    const currentStatus = resolvedSearchParams.status?.toUpperCase();
+                    const isActive =
+                        (statusFilter.value && statusFilter.value === currentStatus) ||
+                        (!statusFilter.value && !currentStatus);
+
+                    return (
+                        <Link
+                            key={statusFilter.label}
+                            href={buildStatusHref(resolvedSearchParams, statusFilter.value)}
+                            className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition ${isActive
+                                ? "border-orange-500 bg-orange-500 text-white"
+                                : "border-slate-200 bg-white text-slate-700 hover:border-orange-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300"
+                                }`}
+                        >
+                            {statusFilter.label}
+                        </Link>
+                    );
+                })}
             </div>
 
             <p className="text-sm text-slate-500 dark:text-slate-400">

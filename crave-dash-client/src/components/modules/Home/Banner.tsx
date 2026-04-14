@@ -1,6 +1,5 @@
 
 import Image from "next/image";
-import Link from "next/link";
 
 import heroImage from "@/assets/images/hero.jpg";
 import { Search } from "lucide-react";
@@ -33,29 +32,29 @@ export default function Banner() {
             <span className="block text-orange-500">Delicious Meals</span>
           </h1>
 
-          <p className="mt-4 max-w-147.5 text-xl leading-relaxed text-slate-100/95">
+          <p className="mt-4 max-w-xl text-lg leading-relaxed text-slate-100/95 sm:text-xl">
             Fresh food from the best local restaurants, delivered to your door.
             Cash on delivery.
           </p>
 
-          <div className="mt-9 flex w-full max-w-xl flex-col gap-3 sm:flex-row">
+          <form action="/meals" className="mt-9 flex w-full max-w-xl flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
               <Search className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
+                name="searchTerm"
                 placeholder="Search for meals..."
                 className="h-12 rounded-xl border-0 bg-white px-4 pl-11 text-base text-slate-900 placeholder:text-slate-500"
               />
             </div>
 
-            <Link href="/browse" className="shrink-0">
-              <Button
-                size="lg"
-                className="h-12 rounded-xl bg-orange-500 px-8 text-base font-semibold text-white shadow-lg shadow-orange-600/30 hover:bg-orange-400"
-              >
-                Browse
-              </Button>
-            </Link>
-          </div>
+            <Button
+              type="submit"
+              size="lg"
+              className="h-12 rounded-xl bg-orange-500 px-8 text-base font-semibold text-white shadow-lg shadow-orange-600/30 hover:bg-orange-400"
+            >
+              Browse
+            </Button>
+          </form>
         </div>
       </div>
     </section>

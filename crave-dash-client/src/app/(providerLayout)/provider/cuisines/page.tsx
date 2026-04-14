@@ -1,4 +1,5 @@
 import { Pencil, Plus, Trash2, } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
@@ -9,6 +10,33 @@ import { getCuisines } from "@/services/cuisine";
 import { ProviderCuisine } from "../data";
 import Image from "next/image";
 import PaginationComponent from "@/components/modules/shared/PaginationComponent";
+
+const statusFilters: Array<{ label: string; value?: string }> = [
+        { label: "All" },
+        { label: "Active", value: "ACTIVE" },
+        { label: "Inactive", value: "INACTIVE" },
+];
+
+function buildStatusHref(params: {
+    searchTerm?: string;
+    status?: string;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+}, status?: string): string {
+    const query = new URLSearchParams();
+
+    if (params.searchTerm) query.set("searchTerm", params.searchTerm);
+    if (params.sortBy) query.set("sortBy", params.sortBy);
+    if (params.sortOrder) query.set("sortOrder", params.sortOrder);
+    query.set("page", "1");
+
+    if (status) {
+        query.set("status", status);
+    }
+
+    const queryString = query.toString();
+    return queryString ? `?${queryString}` : "?";
+}
 
 
 
@@ -32,7 +60,7 @@ const cuisines = await getCuisines({
         sortOrder: resolvedSearchParams.sortOrder,
 })
 
-console.log(cuisines)
+const cuisinesList = cuisines.data?.data ?? [];
 
     return (
         <div className="space-y-6">
@@ -58,16 +86,44 @@ console.log(cuisines)
                     className="h-12 rounded-2xl"
                     label="Sort"
                     options={[
-                        { label: "Name", value: "name" },
-                        { label: "Created At", value: "createdAt" },
+                        { label: "Name Asc", sortBy: "name", sortOrder: "asc" },
+                        { label: "Name Desc", sortBy: "name", sortOrder: "desc" },
+                        { label: "Created Oldest", sortBy: "createdAt", sortOrder: "asc" },
+                        { label: "Created Newest", sortBy: "createdAt", sortOrder: "desc" },
                     ]}
                 />
             </div>
+
+            <div className="flex flex-wrap gap-2">
+                {statusFilters.map((statusFilter) => {
+                    const currentStatus = resolvedSearchParams.status?.toUpperCase();
+                    const isActive =
+                        (statusFilter.value && statusFilter.value === currentStatus) ||
+                        (!statusFilter.value && !currentStatus);
+
+                    return (
+                        <Link
+                            key={statusFilter.label}
+                            href={buildStatusHref(resolvedSearchParams, statusFilter.value)}
+                            className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition ${isActive
+                                ? "border-orange-500 bg-orange-500 text-white"
+                                : "border-slate-200 bg-white text-slate-700 hover:border-orange-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300"
+                                }`}
+                        >
+                            {statusFilter.label}
+                        </Link>
+                    );
+                })}
+            </div>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-                {cuisines.length} cuisine{cuisines.length === 1 ? "" : "s"} found
+                {cuisinesList.length} cuisine{cuisinesList.length === 1 ? "" : "s"} found
             </p>
             <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {cuisines.data.data.map((cuisine: ProviderCuisine) => (
+                {cuisinesList.map((cuisine: ProviderCuisine) => {
+                    const mealsCount = Number(cuisine.mealsCount ?? cuisine.meals ?? 0) || 0;
+                    const categoriesCount = Number(cuisine.categoriesCount ?? cuisine.categories ?? 0) || 0;
+
+                    return (
                     <article key={cuisine.id} className="overflow-hidden rounded-2xl border border-orange-200/70 bg-white/90 shadow-sm dark:border-orange-400/20 dark:bg-slate-900/90">
                         <div className="relative h-32 w-full">
                             <Image src={cuisine.image} alt={cuisine.name} fill sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover" />
@@ -76,7 +132,7 @@ console.log(cuisines)
                             <div className="flex items-start justify-between gap-3">
                                 <div>
                                     <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">{cuisine.name}</h2>
-                                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{cuisine.meals} meals</p>
+                                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{categoriesCount} categories • {mealsCount} meals</p>
                                 </div>
                                 <span className={`rounded-full px-2 py-1 text-xs font-bold whitespace-nowrap ${cuisine.status === "ACTIVE" ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300" : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"}`}>
                                     {cuisine.status}
@@ -89,7 +145,7 @@ console.log(cuisines)
                             </div>
                         </div>
                     </article>
-                ))}
+                )})}
             </section>
             <PaginationComponent totalPage={cuisines.data.meta.totalPages} />
         </div>

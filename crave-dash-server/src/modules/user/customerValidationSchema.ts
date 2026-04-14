@@ -44,6 +44,7 @@ export const customerSchema = z.object({
     .max(20, "Zip code must be less than 20 characters long")
     .optional(),
   profileImage: z.url("Profile picture must be a valid URL").optional(),
+  role: z.enum(["CUSTOMER", "PROVIDER"]).optional(),
 });
 
 export type CustomerInput = z.infer<typeof customerSchema>;

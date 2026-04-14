@@ -47,6 +47,14 @@ type ApiResponse = {
     };
 };
 
+type SearchParams = {
+    page?: string;
+    searchTerm?: string;
+    status?: string;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+};
+
 const statusFilters: Array<{ label: string; value?: AdminOrderStatus }> = [
     { label: "All" },
     { label: "Pending", value: "PENDING" },
@@ -104,16 +112,26 @@ function getItemCount(order: RawOrder): number {
     return items.reduce((sum, item) => sum + (item.quantity ?? 1), 0);
 }
 
+function buildStatusHref(current: SearchParams, status?: AdminOrderStatus): string {
+    const params = new URLSearchParams();
+
+    if (current.searchTerm) params.set("searchTerm", current.searchTerm);
+    if (current.sortBy) params.set("sortBy", current.sortBy);
+    if (current.sortOrder) params.set("sortOrder", current.sortOrder);
+    params.set("page", "1");
+
+    if (status) {
+        params.set("status", status);
+    }
+
+    const query = params.toString();
+    return query ? `?${query}` : "?";
+}
+
 export default async function AdminOrdersPage({
     searchParams,
 }: {
-    searchParams: Promise<{
-        page?: string;
-        searchTerm?: string;
-        status?: string;
-        sortBy?: string;
-        sortOrder?: "asc" | "desc";
-    }>;
+    searchParams: Promise<SearchParams>;
 }) {
     const resolvedSearchParams = await searchParams;
     const currentPage = Number(resolvedSearchParams.page) - 1 || 0;
@@ -121,7 +139,7 @@ export default async function AdminOrdersPage({
     const orders = (await getOrders({
         searchTerm: resolvedSearchParams.searchTerm,
         skip: currentPage,
-        status: resolvedSearchParams.status,
+        orderStatus: resolvedSearchParams.status,
         sortBy: resolvedSearchParams.sortBy,
         sortOrder: resolvedSearchParams.sortOrder,
     })) as ApiResponse;
@@ -162,8 +180,10 @@ export default async function AdminOrdersPage({
                     className="h-12 rounded-2xl"
                     label="Sort"
                     options={[
-                        { label: "Date", value: "createdAt" },
-                        { label: "Total", value: "total" },
+                        { label: "Date Oldest", sortBy: "createdAt", sortOrder: "asc" },
+                        { label: "Date Newest", sortBy: "createdAt", sortOrder: "desc" },
+                        { label: "Total Low", sortBy: "total", sortOrder: "asc" },
+                        { label: "Total High", sortBy: "total", sortOrder: "desc" },
                     ]}
                 />
             </div>
@@ -173,7 +193,7 @@ export default async function AdminOrdersPage({
                     {statusFilters.map((item) => (
                         <Link
                             key={item.label}
-                            href={item.value ? `?status=${item.value}` : "?"}
+                            href={buildStatusHref(resolvedSearchParams, item.value)}
                             className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition ${resolvedSearchParams.status === item.value || (!resolvedSearchParams.status && !item.value)
                                     ? "border-orange-500 bg-orange-500 text-white"
                                     : "border-slate-200 bg-white text-slate-700 hover:border-orange-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300"
@@ -188,7 +208,7 @@ export default async function AdminOrdersPage({
                     {normalizedOrders.length} order{normalizedOrders.length === 1 ? "" : "s"} found
                 </p>
 
-                <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700">
+                <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
                     <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
                         <thead className="bg-slate-50 dark:bg-slate-950">
                             <tr className="text-left text-xs font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
@@ -216,7 +236,7 @@ export default async function AdminOrdersPage({
                                     <td className="px-4 py-4 text-slate-600 dark:text-slate-300">{order.date}</td>
                                     <td className="px-4 py-4">
                                         <Button asChild variant="outline" size="sm" className="rounded-xl">
-                                            <Link href={`/admin/orders/${order.id.toLowerCase()}`}>View Details</Link>
+                                            <Link href={`/admin/orders/${order.id}`}>View Details</Link>
                                         </Button>
                                     </td>
                                 </tr>

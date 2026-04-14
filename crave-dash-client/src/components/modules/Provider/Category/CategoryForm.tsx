@@ -115,7 +115,7 @@ export default function CategoryForm({ cuisineOptions }: { cuisineOptions: Cuisi
                         </option>
                         {cuisineOptions.map((cuisine) => (
                             <option key={getCuisineId(cuisine)} value={getCuisineId(cuisine)}>
-                                {cuisine.name}
+                                {cuisine.name} ({Number(cuisine.categoriesCount ?? cuisine.categories ?? 0) || 0} categories • {Number(cuisine.mealsCount ?? cuisine.meals ?? 0) || 0} meals)
                             </option>
                         ))}
                     </select>

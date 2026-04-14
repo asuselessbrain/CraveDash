@@ -18,5 +18,9 @@ export const config = {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
         email_expires_in: process.env.EMAIL_EXPIRES_IN,
+    },
+    seedAdmin: {
+        email: process.env.ADMIN_EMAIL,
+        password: process.env.ADMIN_PASSWORD,
     }
 }

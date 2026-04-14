@@ -5,7 +5,7 @@ import { Bike, Store, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Provider = {
-	id: number;
+	id: string;
 	slug: string;
 	name: string;
 	image: string;
@@ -15,9 +15,9 @@ type Provider = {
 	popularMeals: [string, string?];
 };
 
-const providers: Provider[] = [
+const fallbackProviders: Provider[] = [
 	{
-		id: 1,
+		id: "1",
 		slug: "pizza-palace",
 		name: "Pizza Palace",
 		image: "/categories/pizza.svg",
@@ -27,7 +27,7 @@ const providers: Provider[] = [
 		popularMeals: ["Truffle Pizza", "Pepperoni Feast"],
 	},
 	{
-		id: 2,
+		id: "2",
 		slug: "burger-hub",
 		name: "Burger Hub",
 		image: "/categories/burger.svg",
@@ -37,7 +37,7 @@ const providers: Provider[] = [
 		popularMeals: ["Smash Burger", "Cheese Bomb"],
 	},
 	{
-		id: 3,
+		id: "3",
 		slug: "biryani-ghor",
 		name: "Biryani Ghor",
 		image: "/categories/biryani.svg",
@@ -47,7 +47,7 @@ const providers: Provider[] = [
 		popularMeals: ["Kacchi Biryani", "Chicken Roast Combo"],
 	},
 	{
-		id: 4,
+		id: "4",
 		slug: "wok-street",
 		name: "Wok Street",
 		image: "/categories/chinese.svg",
@@ -57,7 +57,7 @@ const providers: Provider[] = [
 		popularMeals: ["Szechuan Noodles", "Crispy Chicken"],
 	},
 	{
-		id: 5,
+		id: "5",
 		slug: "sweet-room",
 		name: "Sweet Room",
 		image: "/categories/desserts.svg",
@@ -67,7 +67,7 @@ const providers: Provider[] = [
 		popularMeals: ["Choco Lava Jar", "Red Velvet Slice"],
 	},
 	{
-		id: 6,
+		id: "6",
 		slug: "grill-yard",
 		name: "Grill Yard",
 		image: "/categories/bbq.svg",
@@ -78,9 +78,9 @@ const providers: Provider[] = [
 	},
 ];
 
-const loopedProviders = [...providers, ...providers];
-
-export default function TopRatedProvider() {
+export default function TopRatedProvider({ items }: { items?: Provider[] }) {
+	const providers = items?.length ? items : fallbackProviders;
+	const loopedProviders = [...providers, ...providers];
 	return (
 		<section className="mx-auto mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
 			<div className="overflow-hidden rounded-[2.25rem] border border-orange-200/70 bg-linear-to-br from-orange-50 via-amber-50 to-rose-50 p-6 shadow-lg shadow-orange-500/10 sm:p-8 lg:p-10 dark:border-orange-400/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
@@ -98,7 +98,7 @@ export default function TopRatedProvider() {
 					{loopedProviders.map((provider, index) => (
 						<article
 							key={`${provider.slug}-${index}`}
-							className="w-70 shrink-0 rounded-2xl border border-white/80 bg-white/85 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 dark:border-slate-700 dark:bg-slate-900/85"
+							className="w-70 max-w-[85vw] shrink-0 rounded-2xl border border-white/80 bg-white/85 p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 dark:border-slate-700 dark:bg-slate-900/85"
 						>
 							<div className="flex items-center gap-3">
 								<div className="relative h-12 w-12 overflow-hidden rounded-full border border-orange-100 bg-white">
@@ -139,7 +139,7 @@ export default function TopRatedProvider() {
 							</div>
 
 							<Button asChild className="mt-5 h-10 w-full rounded-xl bg-orange-500 font-semibold text-white hover:bg-orange-400">
-								<Link href={`/providers/${provider.slug}`}>View Menu</Link>
+								<Link href={`/meals?searchTerm=${encodeURIComponent(provider.name)}`}>View Menu</Link>
 							</Button>
 						</article>
 					))}

@@ -4,7 +4,7 @@ import { Building2, Star, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type TrendingMeal = {
-	id: number;
+	id: string;
 	name: string;
 	image: string;
 	rating: number;
@@ -13,15 +13,15 @@ type TrendingMeal = {
 	price: number;
 };
 
-const trendingMeals: TrendingMeal[] = [
-	{ id: 1, name: "Truffle Cheese Pizza", image: "/categories/pizza.svg", rating: 4.8, reviews: 1324, provider: "Pizza Palace", price: 12.99 },
-	{ id: 2, name: "Crispy Smash Burger", image: "/categories/burger.svg", rating: 4.7, reviews: 987, provider: "Burger Hub", price: 9.49 },
-	{ id: 3, name: "Royal Kacchi Biryani", image: "/categories/biryani.svg", rating: 4.9, reviews: 1560, provider: "Biryani Ghar", price: 11.99 },
-	{ id: 4, name: "Szechuan Noodle Bowl", image: "/categories/chinese.svg", rating: 4.6, reviews: 841, provider: "Wok Street", price: 10.49 },
-	{ id: 5, name: "Molten Chocolate Jar", image: "/categories/desserts.svg", rating: 4.8, reviews: 743, provider: "Sweet Room", price: 6.99 },
-	{ id: 6, name: "Berry Chill Smoothie", image: "/categories/drinks.svg", rating: 4.5, reviews: 519, provider: "Juice Point", price: 4.99 },
-	{ id: 7, name: "Smoked BBQ Wings", image: "/categories/bbq.svg", rating: 4.7, reviews: 678, provider: "Grill Yard", price: 13.49 },
-	{ id: 8, name: "Garlic Butter Steak", image: "/categories/steak.svg", rating: 4.9, reviews: 904, provider: "Prime Cut", price: 17.99 },
+const fallbackTrendingMeals: TrendingMeal[] = [
+	{ id: "1", name: "Truffle Cheese Pizza", image: "/categories/pizza.svg", rating: 4.8, reviews: 1324, provider: "Pizza Palace", price: 12.99 },
+	{ id: "2", name: "Crispy Smash Burger", image: "/categories/burger.svg", rating: 4.7, reviews: 987, provider: "Burger Hub", price: 9.49 },
+	{ id: "3", name: "Royal Kacchi Biryani", image: "/categories/biryani.svg", rating: 4.9, reviews: 1560, provider: "Biryani Ghar", price: 11.99 },
+	{ id: "4", name: "Szechuan Noodle Bowl", image: "/categories/chinese.svg", rating: 4.6, reviews: 841, provider: "Wok Street", price: 10.49 },
+	{ id: "5", name: "Molten Chocolate Jar", image: "/categories/desserts.svg", rating: 4.8, reviews: 743, provider: "Sweet Room", price: 6.99 },
+	{ id: "6", name: "Berry Chill Smoothie", image: "/categories/drinks.svg", rating: 4.5, reviews: 519, provider: "Juice Point", price: 4.99 },
+	{ id: "7", name: "Smoked BBQ Wings", image: "/categories/bbq.svg", rating: 4.7, reviews: 678, provider: "Grill Yard", price: 13.49 },
+	{ id: "8", name: "Garlic Butter Steak", image: "/categories/steak.svg", rating: 4.9, reviews: 904, provider: "Prime Cut", price: 17.99 },
 ];
 
 function renderStars(rating: number) {
@@ -37,7 +37,8 @@ function renderStars(rating: number) {
 	});
 }
 
-export default function TrendingNow() {
+export default function TrendingNow({ meals }: { meals?: TrendingMeal[] }) {
+	const trendingMeals = meals?.length ? meals : fallbackTrendingMeals;
 	return (
 		<section className="mx-auto mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
 			<div className="overflow-hidden rounded-[2.25rem] border border-orange-200/70 bg-linear-to-br from-orange-50 via-amber-50 to-rose-50 p-6 shadow-lg shadow-orange-500/10 sm:p-8 lg:p-10 dark:border-orange-400/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">

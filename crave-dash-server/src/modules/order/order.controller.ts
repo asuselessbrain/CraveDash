@@ -61,6 +61,17 @@ const getOrderById = catchAsync(async (req: AuthenticatedRequest, res: Response)
   });
 });
 
+const getAdminOrderById = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
+  const orderId = req.params.id as string;
+  const result = await OrderService.getOrderById(orderId, req.user.email, Role.ADMIN);
+
+  res.status(200).json({
+    success: true,
+    message: "Admin order retrieved successfully",
+    data: result,
+  });
+});
+
 const updateProviderOrderStatus = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
   const orderId = req.params.id as string;
   const result = await OrderService.updateProviderOrderStatus(
@@ -82,6 +93,7 @@ export const OrderController = {
   getMyOrders,
   getProvidersOrders,
   getAdminOrders,
+  getAdminOrderById,
   getOrderById,
   updateProviderOrderStatus,
 };

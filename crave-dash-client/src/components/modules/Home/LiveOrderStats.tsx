@@ -7,10 +7,10 @@ type Stat = {
 	label: string;
 	value: number;
 	suffix: string;
-	icon: ComponentType<{ className?: string }>;
+	icon?: ComponentType<{ className?: string }>;
 };
 
-const stats: Stat[] = [
+const fallbackStats: Stat[] = [
 	{ label: "Total Orders Delivered", value: 50000, suffix: "+", icon: ShoppingBag },
 	{ label: "Active Restaurants", value: 500, suffix: "+", icon: Building2 },
 	{ label: "Happy Customers", value: 25000, suffix: "+", icon: Users },
@@ -21,7 +21,16 @@ function formatCount(value: number) {
 	return value.toLocaleString("en-US");
 }
 
-export default function LiveOrderStats() {
+export default function LiveOrderStats({ items }: { items?: Stat[] }) {
+	const stats = (items?.length ? items : fallbackStats).map((item, index) => {
+		if (item.icon) return item;
+
+		const icons: Array<ComponentType<{ className?: string }>> = [ShoppingBag, Building2, Users, MapPin];
+		return {
+			...item,
+			icon: icons[index % icons.length],
+		};
+	});
 	const sectionRef = useRef<HTMLElement | null>(null);
 	const [hasStarted, setHasStarted] = useState(false);
 	const [counts, setCounts] = useState(() => stats.map(() => 0));
@@ -76,7 +85,7 @@ export default function LiveOrderStats() {
 
 				<div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
 					{stats.map((stat, index) => {
-						const Icon = stat.icon;
+						const Icon = stat.icon ?? ShoppingBag;
 
 						return (
 							<article

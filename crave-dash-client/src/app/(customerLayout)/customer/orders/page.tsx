@@ -145,9 +145,9 @@ function toApiOrderStatus(status: OrderStatusFilter): string | undefined {
         case "Delivered":
             return "DELIVERED";
         case "On the way":
-            return "ON_THE_WAY";
+            return "SHIPPED";
         case "Preparing":
-            return "PROCESSING";
+            return "PREPARING";
         case "Pending":
             return "PENDING";
         case "Cancelled":
@@ -195,7 +195,7 @@ export default async function CustomerOrdersPage({ searchParams }: { searchParam
 
     const ordersResponse = await getCustomerOrders({
         searchTerm,
-        status: toApiOrderStatus(selectedStatus),
+        orderStatus: toApiOrderStatus(selectedStatus),
         sortBy,
         sortOrder,
         skip: page,
@@ -229,12 +229,13 @@ export default async function CustomerOrdersPage({ searchParams }: { searchParam
                     <SortingComponent
                         className="h-12 rounded-2xl"
                         label="Sort"
-                        defaultSortBy="createdAt"
-                        defaultSortOrder="asc"
                         options={[
-                            { label: "Date", value: "createdAt" },
-                            { label: "Total", value: "total" },
-                            { label: "Status", value: "orderStatus" },
+                            { label: "Date Oldest", sortBy: "createdAt", sortOrder: "asc" },
+                            { label: "Date Newest", sortBy: "createdAt", sortOrder: "desc" },
+                            { label: "Total Low", sortBy: "total", sortOrder: "asc" },
+                            { label: "Total High", sortBy: "total", sortOrder: "desc" },
+                            { label: "Status Asc", sortBy: "orderStatus", sortOrder: "asc" },
+                            { label: "Status Desc", sortBy: "orderStatus", sortOrder: "desc" },
                         ]}
                     />
                 </div>
@@ -261,7 +262,7 @@ export default async function CustomerOrdersPage({ searchParams }: { searchParam
                     })}
                 </div>
 
-                <div className="mt-6 hidden overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 lg:block">
+                <div className="mt-6 hidden overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700 lg:block">
                     <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
                         <thead className="bg-slate-50 dark:bg-slate-950">
                             <tr className="text-left text-xs font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">

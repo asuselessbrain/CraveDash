@@ -179,7 +179,7 @@ export default async function ProviderOrdersPage({ searchParams }: { searchParam
 
     const ordersResponse = await getProviderOrders({
         searchTerm,
-        status: selectedStatus || undefined,
+        orderStatus: selectedStatus || undefined,
         sortBy,
         sortOrder,
         skip: page,
@@ -189,8 +189,6 @@ export default async function ProviderOrdersPage({ searchParams }: { searchParam
 
     const rawOrders: RawOrder[] = ordersResponse?.data?.data || [];
     const orders = rawOrders.map(normalizeOrder);
-
-    console.log(orders)
 
     const totalOrders = Number(ordersResponse?.data?.meta?.total ?? orders.length);
     const computedTotalPages = Math.ceil(totalOrders / limit);
@@ -225,12 +223,13 @@ export default async function ProviderOrdersPage({ searchParams }: { searchParam
                     <SortingComponent
                         className="h-12 rounded-2xl"
                         label="Sort"
-                        defaultSortBy="createdAt"
-                        defaultSortOrder="asc"
                         options={[
-                            { label: "Date", value: "createdAt" },
-                            { label: "Total", value: "total" },
-                            { label: "Status", value: "orderStatus" },
+                            { label: "Date Oldest", sortBy: "createdAt", sortOrder: "asc" },
+                            { label: "Date Newest", sortBy: "createdAt", sortOrder: "desc" },
+                            { label: "Total Low", sortBy: "total", sortOrder: "asc" },
+                            { label: "Total High", sortBy: "total", sortOrder: "desc" },
+                            { label: "Status Asc", sortBy: "orderStatus", sortOrder: "asc" },
+                            { label: "Status Desc", sortBy: "orderStatus", sortOrder: "desc" },
                         ]}
                     />
                 </div>
@@ -259,7 +258,7 @@ export default async function ProviderOrdersPage({ searchParams }: { searchParam
                     })}
                 </div>
 
-                <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700">
+                <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
                     <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
                         <thead className="bg-slate-50 dark:bg-slate-950">
                             <tr className="text-left text-xs font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">

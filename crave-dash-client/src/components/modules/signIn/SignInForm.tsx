@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ForgotPassword from "../ForgetPassword/ForgotPassword";
+import { useUser } from "@/context/UserContext";
 
 export function SignInForm({
   className,
@@ -38,10 +39,12 @@ export function SignInForm({
   const { formState: { isSubmitting } } = form;
 
   const router = useRouter()
+  const { refreshUser } = useUser();
 
   const handleSignIn = async (data: FieldValues) => {
     const res = await signInUser(data)
     if (res.success) {
+      await refreshUser();
       router.push("/")
       toast.success(res.message || "Signed in successfully!")
     }
