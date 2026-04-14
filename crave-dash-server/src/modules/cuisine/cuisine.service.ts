@@ -3,6 +3,8 @@ import { prisma } from "../../lib/prisma";
 import { pagination } from "../../utils/pagination";
 import { searching } from "../../utils/searching";
 import { filtering } from "../../utils/filtering";
+import AppError from "../../errors/appError";
+import { config } from "../../config";
 
 const attachCuisineCounts = async <T extends { id: string; _count?: { categories: number } }>(cuisines: T[]) => {
     if (!cuisines.length) {
@@ -232,10 +234,43 @@ const updateCuisine = async (cuisineId: string, payload: Prisma.CuisineUpdateInp
     return result;
 }
 
+const deleteCuisine = async (providerEmail: string, cuisineId: string) => {
+    const cuisine = await prisma.cuisine.findUnique({
+        where: {
+            id: cuisineId
+        },
+    });
+
+    if (!cuisine) {
+        throw new AppError(404, "Cuisine not found");
+    }
+
+    const isAdmin = await prisma.user.findFirst({
+        where: {
+            email: providerEmail,
+            role: "ADMIN",
+        },
+    })
+
+    if (cuisine.providerEmail === providerEmail || isAdmin) {
+        const result = await prisma.cuisine.delete({
+            where: {
+                id: cuisineId,
+                providerEmail,
+            },
+        });
+
+        return result
+    }
+
+    throw new AppError(403, "You don't have permission to delete this cuisine");
+}
+
 export const CuisineService = {
     createCuisine,
     getCuisines,
     getProviderAllCuisines,
     getAllCuisinesForFiltering,
-    updateCuisine
+    updateCuisine,
+    deleteCuisine
 }

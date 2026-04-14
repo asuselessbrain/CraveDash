@@ -50,3 +50,9 @@ export const getCuisinesForFiltering = async () => {
     const result = await baseApi("cuisine/filtering", "GET", undefined, undefined, "cuisines")
     return result;
 }
+
+export const deleteCuisine = async (id: string) => {
+    const result = await baseApi(`cuisine/${id}`, "DELETE", undefined, undefined, "cuisines")
+    revalidateTag("cuisines", "max")
+    return result;
+}

@@ -60,10 +60,22 @@ const getProviderAllCuisines = catchAsync(async (req: Request & { user?: { email
     })
 })
 
+const deleteCuisine = catchAsync(async (req: Request & { user?: { email: string } }, res: Response) => {
+    const providerEmail = req.user?.email as string;
+    const cuisineId = req.params.id as string;
+    await CuisineService.deleteCuisine(providerEmail, cuisineId);
+
+    res.status(200).json({
+        success: true,
+        message: "Cuisine deleted successfully",
+    })
+})
+
 export const CuisineController = {
     createCuisine,
     getCuisines,
     getAllCuisinesForFiltering,
     updateCuisine,
-    getProviderAllCuisines
+    getProviderAllCuisines,
+    deleteCuisine
 }

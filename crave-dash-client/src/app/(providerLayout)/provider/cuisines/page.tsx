@@ -1,16 +1,22 @@
-import { Pencil, Plus, Trash2, } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import CuisineForm from "@/components/modules/Provider/Cuisine/CuisineForm";
+import CuisineActions from "@/components/modules/Provider/Cuisine/CuisineActions";
 import Search from "@/components/modules/shared/SearchComponent";
 import SortingComponent from "@/components/modules/shared/SortingComponent";
-import { getCuisines, getProviderCuisines, updateCuisine } from "@/services/cuisine";
-import { ProviderCuisine } from "../data";
+import { deleteCuisine, getProviderCuisines, updateCuisine } from "@/services/cuisine";
+import { ProviderCuisine, ProviderCuisineStatus } from "../data";
 import Image from "next/image";
 import PaginationComponent from "@/components/modules/shared/PaginationComponent";
 import { revalidatePath } from "next/cache";
+
+type CuisineActionResult = {
+    success: boolean;
+    message: string;
+};
 
 const statusFilters: Array<{ label: string; value?: string }> = [
         { label: "All" },
@@ -70,11 +76,70 @@ async function toggleCuisineStatusAction(formData: FormData) {
     const nextStatus = String(formData.get("nextStatus") || "").trim();
 
     if (!cuisineId || (nextStatus !== "ACTIVE" && nextStatus !== "INACTIVE")) {
-        return;
+        return {
+            success: false,
+            message: "Invalid cuisine or status.",
+        } satisfies CuisineActionResult;
     }
 
-    await updateCuisine(cuisineId, { status: nextStatus });
-    revalidatePath("/provider/cuisines");
+    try {
+        const result = await updateCuisine(cuisineId, { status: nextStatus as ProviderCuisineStatus });
+
+        if (result?.success === false) {
+            return {
+                success: false,
+                message: result?.errorMessage || "Failed to update cuisine status.",
+            } satisfies CuisineActionResult;
+        }
+
+        revalidatePath("/provider/cuisines");
+
+        return {
+            success: true,
+            message: result?.message || "Cuisine status updated successfully!",
+        } satisfies CuisineActionResult;
+    } catch {
+        return {
+            success: false,
+            message: "Something went wrong while updating cuisine status.",
+        } satisfies CuisineActionResult;
+    }
+}
+
+async function deleteCuisineAction(formData: FormData) {
+    "use server";
+
+    const cuisineId = String(formData.get("cuisineId") || "").trim();
+
+    if (!cuisineId) {
+        return {
+            success: false,
+            message: "Invalid cuisine id.",
+        } satisfies CuisineActionResult;
+    }
+
+    try {
+        const result = await deleteCuisine(cuisineId);
+
+        if (result?.success === false) {
+            return {
+                success: false,
+                message: result?.errorMessage || "Failed to delete cuisine.",
+            } satisfies CuisineActionResult;
+        }
+
+        revalidatePath("/provider/cuisines");
+
+        return {
+            success: true,
+            message: result?.message || "Cuisine deleted successfully!",
+        } satisfies CuisineActionResult;
+    } catch {
+        return {
+            success: false,
+            message: "Something went wrong while deleting cuisine.",
+        } satisfies CuisineActionResult;
+    }
 }
 
     return (
@@ -177,26 +242,23 @@ async function toggleCuisineStatusAction(formData: FormData) {
                                             <CuisineForm />
                                         )}
                                     </Dialog>
-                                    <Button variant="destructive" size="sm" className="rounded-xl flex-1"><Trash2 className="h-4 w-4" /> Delete</Button>
+                                    <CuisineActions
+                                        cuisineId={cuisineId}
+                                        status={cuisine.status}
+                                        onDeleteAction={deleteCuisineAction}
+                                        onToggleStatusAction={toggleCuisineStatusAction}
+                                        showToggle={false}
+                                        containerClassName="flex-1"
+                                    />
                                 </div>
-                                {cuisineId ? (
-                                    <form action={toggleCuisineStatusAction} className="mt-2">
-                                        <input type="hidden" name="cuisineId" value={cuisineId} />
-                                        <input
-                                            type="hidden"
-                                            name="nextStatus"
-                                            value={cuisine.status === "ACTIVE" ? "INACTIVE" : "ACTIVE"}
-                                        />
-                                        <Button
-                                            type="submit"
-                                            variant="outline"
-                                            size="sm"
-                                            className="w-full rounded-xl"
-                                        >
-                                            {cuisine.status === "ACTIVE" ? "Mark Inactive" : "Mark Active"}
-                                        </Button>
-                                    </form>
-                                ) : null}
+                                <CuisineActions
+                                    cuisineId={cuisineId}
+                                    status={cuisine.status}
+                                    onDeleteAction={deleteCuisineAction}
+                                    onToggleStatusAction={toggleCuisineStatusAction}
+                                    showDelete={false}
+                                    containerClassName="mt-2 w-full"
+                                />
                             </div>
                         </article>
                     )})}
