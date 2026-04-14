@@ -158,6 +158,8 @@ const getAllCuisinesForFiltering = async () => {
     return await attachCuisineCounts(result);
 };
 
+// const updateCui
+
 export const CuisineService = {
     createCuisine,
     getCuisines,

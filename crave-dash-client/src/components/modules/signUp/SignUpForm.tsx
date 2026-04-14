@@ -42,7 +42,6 @@ export function SignUpForm({
       if (res.success) {
         await refreshUser();
         router.push("/")
-        router.refresh();
         toast.success(res.message || "Account created successfully!")
       }
       else {

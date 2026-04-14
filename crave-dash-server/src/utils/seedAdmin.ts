@@ -20,8 +20,6 @@ export const seedAdmin = async () => {
             },
         });
 
-        console.log(existingAdmin)
-
         if (!existingAdmin) {
             await prisma.user.create({
                 data: {

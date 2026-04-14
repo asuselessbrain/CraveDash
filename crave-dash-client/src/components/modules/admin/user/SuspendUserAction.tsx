@@ -15,7 +15,6 @@ export default function SuspendUserAction({ id, status }: { id: string; status: 
 
         if (res.success) {
             toast.success(res.message || "User status updated successfully");
-            router.refresh();
         } else {
             toast.error(res.errorMessage || "Failed to update user status");
         }

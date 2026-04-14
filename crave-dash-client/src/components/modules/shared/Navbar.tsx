@@ -85,7 +85,6 @@ const Navbar = () => {
     toast.success("Successfully signed out.");
 
     router.push("/");
-    router.refresh();
   } catch {
     toast.error("Failed to sign out.");
   }

@@ -260,7 +260,6 @@ export default function MenuForm({
             if (result?.success) {
                 toast.success(result.message || `Meal ${mealId ? "updated" : "created"} successfully!`);
                 router.push(successHref);
-                router.refresh();
                 return;
             }
 

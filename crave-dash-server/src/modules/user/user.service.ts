@@ -24,11 +24,6 @@ type AdminUpdateUserPayload = {
 };
 
 const createCustomer = async (data: CustomerInput) => {
-  const role = data.role ?? Role.CUSTOMER;
-
-  if (role === Role.ADMIN) {
-    throw new AppError(403, "Admin account cannot be created from public registration");
-  }
 
   const hashedPassword = await bcrypt.hash(
     data.password,
@@ -39,7 +34,7 @@ const createCustomer = async (data: CustomerInput) => {
   const useData = {
     email: data.email,
     password: data.password,
-    role,
+    role: data.role ?? Role.CUSTOMER,
   };
 
   const customerData = {
@@ -49,12 +44,9 @@ const createCustomer = async (data: CustomerInput) => {
   };
   await prisma.user.create({ data: useData });
 
-  const customer =
-    role === Role.CUSTOMER
-      ? await prisma.customer.create({
-          data: customerData,
-        })
-      : null;
+  const customer = await prisma.customer.create({
+    data: customerData,
+  })
 
 
   const token = jwt.sign(
@@ -64,8 +56,7 @@ const createCustomer = async (data: CustomerInput) => {
   );
 
   return {
-    ...(customer ?? { email: data.email, fullName: data.fullName }),
-    role: useData.role,
+    customer,
     token,
   };
 };
