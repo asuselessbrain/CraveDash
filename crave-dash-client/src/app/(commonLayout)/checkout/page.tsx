@@ -1,5 +1,6 @@
 import { getCartItems } from "@/services/cart";
 import CheckOutForm from "@/components/modules/checkOut/CheckOutForm";
+import { getMyProfile } from "@/services/user";
 
 type CartMeal = {
     name: string;
@@ -24,8 +25,18 @@ type CartResponse = {
     };
 };
 
+type ProfileResponse = {
+    data?: {
+        fullName?: string;
+        phoneNumber?: string;
+        address?: string;
+        city?: string;
+    };
+};
+
 export default async function CheckoutPage() {
     const cartResponse = (await getCartItems()) as CartResponse;
+    const profileResponse = (await getMyProfile()) as ProfileResponse;
 
     const orderItems = cartResponse?.data?.items ?? [];
     const isEmpty = orderItems.length === 0;
@@ -47,6 +58,12 @@ export default async function CheckoutPage() {
         ? 0
         : Number(cartResponse?.data?.meta?.total ?? subtotal + deliveryFee + tax);
 
+    const profileAddress = profileResponse?.data?.address ?? "";
+    const [streetAddress, area] = profileAddress
+        .split(",")
+        .map((segment) => segment.trim())
+        .filter(Boolean);
+
     return (
         <main className="food-landing-bg">
             <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -62,6 +79,13 @@ export default async function CheckoutPage() {
                     deliveryFee={deliveryFee}
                     tax={tax}
                     total={total}
+                    initialAddress={{
+                        fullName: profileResponse?.data?.fullName ?? "",
+                        phoneNumber: profileResponse?.data?.phoneNumber ?? "",
+                        streetAddress: streetAddress ?? "",
+                        area: area ?? "",
+                        city: profileResponse?.data?.city ?? "Dhaka",
+                    }}
                 />
             </div>
         </main>

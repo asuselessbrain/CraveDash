@@ -8,6 +8,7 @@ import { Role } from "../../../generated/prisma/enums";
 const router = express.Router();
 
 router.post("/customers", validateRequest(customerSchema), UserController.createCustomer)
+router.get("/me", auth(Role.CUSTOMER, Role.PROVIDER, Role.ADMIN), UserController.getMyProfile)
 router.get("/admin/users", auth(Role.ADMIN, Role.CUSTOMER), UserController.getAdminUsers)
 router.get("/admin/users/:id", auth(Role.ADMIN, Role.CUSTOMER), UserController.getAdminUserById)
 router.post("/admin/users", auth(Role.ADMIN, Role.CUSTOMER), UserController.createUserByAdmin)

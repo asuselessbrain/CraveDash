@@ -166,7 +166,7 @@ export default function MealDetailsContent({ meal, mealId, categoryName }: MealD
                         </div>
                         <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950">
                             <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Discount</p>
-                            <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-100">{meal.discount ? `$${Number(meal.discount).toFixed(2)}` : "N/A"}</p>
+                            <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-100">{meal.discount ? `৳${Number(meal.discount).toFixed(2)}` : "N/A"}</p>
                         </div>
                         <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-950">
                             <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Video URL</p>
@@ -208,7 +208,7 @@ export default function MealDetailsContent({ meal, mealId, categoryName }: MealD
                 <div className="rounded-3xl border border-orange-200/70 bg-white/90 p-6 shadow-sm dark:border-orange-400/20 dark:bg-slate-900/90">
                     <p className="text-xs font-semibold tracking-widest text-slate-600 dark:text-slate-400 uppercase">Price</p>
                     <p className="mt-2 text-4xl font-black text-orange-600 dark:text-orange-400">
-                        ${Number(meal.price).toFixed(2)}
+                        ৳{Number(meal.price).toFixed(2)}
                     </p>
                 </div>
 
@@ -281,7 +281,7 @@ export default function MealDetailsContent({ meal, mealId, categoryName }: MealD
                     {meal.discount && (
                         <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
                             <p className="text-xs font-semibold tracking-widest text-slate-600 dark:text-slate-400 uppercase">Discount</p>
-                            <p className="mt-2 text-sm font-semibold text-red-600 dark:text-red-400">-${Number(meal.discount).toFixed(2)}</p>
+                            <p className="mt-2 text-sm font-semibold text-red-600 dark:text-red-400">-৳{Number(meal.discount).toFixed(2)}</p>
                         </div>
                     )}
 

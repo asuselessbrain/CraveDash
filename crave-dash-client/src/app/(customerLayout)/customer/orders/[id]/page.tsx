@@ -324,7 +324,7 @@ export default async function CustomerOrderDetailsPage({ params }: { params: Pro
                       <p className="text-sm text-slate-500 dark:text-slate-400">Qty {item.quantity}</p>
                     </div>
                   </div>
-                  <p className="font-semibold text-slate-900 dark:text-slate-100">${item.lineTotal.toFixed(2)}</p>
+                  <p className="font-semibold text-slate-900 dark:text-slate-100">৳{item.lineTotal.toFixed(2)}</p>
                 </article>
               ))}
             </div>
@@ -337,20 +337,20 @@ export default async function CustomerOrderDetailsPage({ params }: { params: Pro
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
                 <span>Subtotal</span>
-                <span className="font-semibold">${order.subtotal.toFixed(2)}</span>
+                <span className="font-semibold">৳{order.subtotal.toFixed(2)}</span>
               </div>
               <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
                 <span>Delivery Fee</span>
-                <span className="font-semibold">${order.deliveryFee.toFixed(2)}</span>
+                <span className="font-semibold">৳{order.deliveryFee.toFixed(2)}</span>
               </div>
               <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
                 <span>Tax</span>
-                <span className="font-semibold">${order.tax.toFixed(2)}</span>
+                <span className="font-semibold">৳{order.tax.toFixed(2)}</span>
               </div>
               <div className="my-2 h-px bg-slate-200 dark:bg-slate-700" />
               <div className="flex items-center justify-between text-base font-black text-slate-900 dark:text-slate-100">
                 <span>Total</span>
-                <span>${order.total.toFixed(2)}</span>
+                <span>৳{order.total.toFixed(2)}</span>
               </div>
             </div>
           </div>

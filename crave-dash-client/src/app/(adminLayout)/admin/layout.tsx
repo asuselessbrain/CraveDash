@@ -1,6 +1,7 @@
 import { BadgePercent } from "lucide-react";
 import Logout from "@/components/modules/shared/Logout";
 import NavBar, { type NavigationItem } from "@/components/modules/admin/navBar/NavBar";
+import Link from "next/link";
 
 const navigation = [
     { href: "/admin", label: "Dashboard", icon: "dashboard" },
@@ -13,17 +14,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     return (
         <div className="min-h-screen bg-linear-to-br from-slate-100 via-orange-50/40 to-slate-100 text-slate-900 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 dark:text-slate-100">
-            <div className="mx-auto flex min-h-screen w-full max-w-screen-2xl flex-col lg:flex-row">
-                <aside className="flex flex-col border-b border-slate-200/90 bg-white/95 px-4 py-4 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/95 lg:sticky lg:top-0 lg:h-screen lg:w-72 lg:border-r lg:border-b-0 lg:px-5 lg:py-6">
-                    <div className="flex items-center gap-3 rounded-2xl border border-orange-200/70 bg-orange-50 px-4 py-3 dark:border-orange-400/20 dark:bg-orange-500/10">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500 text-white">
-                            <BadgePercent className="h-5 w-5" />
+            <div className="mx-auto flex min-h-screen w-full max-w-screen-2xl flex-col lg:pl-72">
+                <aside className="flex flex-col border-b border-slate-200/90 bg-white/95 px-4 py-4 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/95 lg:fixed lg:inset-y-0 lg:left-[max(0px,calc((100vw-1536px)/2))] lg:z-30 lg:w-72 lg:overflow-y-auto lg:border-r lg:border-b-0 lg:px-5 lg:py-6">
+                    <Link href="/">
+                        <div className="flex items-center gap-3 rounded-2xl border border-orange-200/70 bg-orange-50 px-4 py-3 dark:border-orange-400/20 dark:bg-orange-500/10">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500 text-white">
+                                <BadgePercent className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-semibold tracking-widest text-orange-700 uppercase dark:text-orange-300">Admin Panel</p>
+                                <h1 className="text-base font-black tracking-tight">CraveDash Control</h1>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-xs font-semibold tracking-widest text-orange-700 uppercase dark:text-orange-300">Admin Panel</p>
-                            <h1 className="text-base font-black tracking-tight">CraveDash Control</h1>
-                        </div>
-                    </div>
+                    </Link>
 
                     <NavBar navigation={navigation} />
 

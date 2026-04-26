@@ -242,7 +242,7 @@ export default async function CustomerDashboardPage() {
                   })
                   .join(", ") ??
                 "No item details";
-              const amountText = order.formattedTotal ?? `$${formatAmount(order.total ?? order.amount ?? order.grandTotal)}`;
+              const amountText = order.formattedTotal ?? `৳${formatAmount(order.total ?? order.amount ?? order.grandTotal)}`;
 
               return (
                 <article key={order.id ?? order.orderId ?? order.orderNumber} className="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4 dark:border-slate-700 dark:bg-slate-950/60">

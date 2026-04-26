@@ -227,7 +227,7 @@ export default async function AdminOrdersPage({
                                     <td className="px-4 py-4 font-semibold text-slate-900 dark:text-slate-100">{order.displayId}</td>
                                     <td className="px-4 py-4 text-slate-600 dark:text-slate-300">{order.customer}</td>
                                     <td className="px-4 py-4 text-slate-600 dark:text-slate-300">{order.itemCount} item{order.itemCount === 1 ? "" : "s"}</td>
-                                    <td className="px-4 py-4 text-slate-600 dark:text-slate-300">${order.total.toFixed(2)}</td>
+                                    <td className="px-4 py-4 text-slate-600 dark:text-slate-300">৳{order.total.toFixed(2)}</td>
                                     <td className="px-4 py-4">
                                         <span className={`inline-block rounded-full border px-3 py-1 text-xs font-semibold ${statusStyles(order.status)}`}>
                                             {formatStatus(order.status)}

@@ -1,7 +1,13 @@
+ "use client";
+
 import Image from "next/image";
 import { Building2, Star, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { MouseEvent, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { addToCart } from "@/services/cart";
 
 type TrendingMeal = {
 	id: string;
@@ -38,7 +44,41 @@ function renderStars(rating: number) {
 }
 
 export default function TrendingNow({ meals }: { meals?: TrendingMeal[] }) {
+	const router = useRouter();
+	const [addingMealId, setAddingMealId] = useState<string | null>(null);
 	const trendingMeals = meals?.length ? meals : fallbackTrendingMeals;
+
+	const handleQuickAdd = async (event: MouseEvent<HTMLButtonElement>, mealId: string) => {
+		event.preventDefault();
+		event.stopPropagation();
+
+		if (!mealId || addingMealId) return;
+
+		setAddingMealId(mealId);
+		try {
+			const res = await addToCart(mealId, 1);
+			if (res?.success) {
+				toast.success(res.message || "Added to cart");
+				return;
+			}
+
+			toast.error(res?.errorMessage || "Failed to add to cart. Please try again.");
+		} catch {
+			toast.error("Failed to add to cart. Please try again.");
+		} finally {
+			setAddingMealId(null);
+		}
+	};
+
+	const handleCardClick = (event: MouseEvent<HTMLElement>, mealId: string) => {
+		const target = event.target as HTMLElement;
+		if (target.closest("button")) {
+			return;
+		}
+
+		router.push(`/meals/${mealId}`);
+	};
+
 	return (
 		<section className="mx-auto mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
 			<div className="overflow-hidden rounded-[2.25rem] border border-orange-200/70 bg-linear-to-br from-orange-50 via-amber-50 to-rose-50 p-6 shadow-lg shadow-orange-500/10 sm:p-8 lg:p-10 dark:border-orange-400/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
@@ -52,7 +92,8 @@ export default function TrendingNow({ meals }: { meals?: TrendingMeal[] }) {
 				{trendingMeals.map((meal) => (
 					<article
 						key={meal.id}
-						className="group overflow-hidden rounded-2xl border border-white/80 bg-white/85 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 dark:border-slate-700 dark:bg-slate-900/85"
+						onClick={(event) => handleCardClick(event, meal.id)}
+						className="group cursor-pointer overflow-hidden rounded-2xl border border-white/80 bg-white/85 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 dark:border-slate-700 dark:bg-slate-900/85"
 					>
 						<div className="relative h-42 overflow-hidden">
 							<Image
@@ -78,11 +119,16 @@ export default function TrendingNow({ meals }: { meals?: TrendingMeal[] }) {
 							</div>
 
 							<div className="mt-4 flex items-center justify-between gap-2">
-								<p className="text-lg font-extrabold text-orange-600 dark:text-orange-300">${meal.price.toFixed(2)}</p>
+								<p className="text-lg font-extrabold text-orange-600 dark:text-orange-300">৳{meal.price.toFixed(2)}</p>
 
-								<Button size="sm" className="rounded-full bg-orange-500 px-4 text-white hover:bg-orange-400">
+								<Button
+									size="sm"
+									onClick={(event) => handleQuickAdd(event, meal.id)}
+									disabled={addingMealId === meal.id}
+									className="rounded-full bg-orange-500 px-4 text-white hover:bg-orange-400"
+								>
 									<Plus className="h-4 w-4" />
-									Quick Add
+									{addingMealId === meal.id ? "Adding..." : "Quick Add"}
 								</Button>
 							</div>
 						</div>

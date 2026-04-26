@@ -34,6 +34,7 @@ type MealsListProps = {
     meals: MealData[];
     totalPages: number;
     onDelete?: (mealId: string) => void;
+    onToggleAvailability?: (mealId: string) => void;
     isLoading?: boolean;
 };
 
@@ -53,9 +54,11 @@ const spiceLevelColors: Record<string, string> = {
 export default function MealsList({
     meals,
     onDelete,
+    onToggleAvailability,
     isLoading = false,
 }: MealsListProps) {
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [togglingId, setTogglingId] = useState<string | null>(null);
 
     const handleDelete = async (mealId: string) => {
         if (!onDelete) return;
@@ -68,6 +71,20 @@ export default function MealsList({
             toast.error("Failed to delete meal. Please try again.");
         } finally {
             setDeletingId(null);
+        }
+    };
+
+    const handleToggleAvailability = async (mealId: string) => {
+        if (!onToggleAvailability) return;
+
+        setTogglingId(mealId);
+        try {
+            await onToggleAvailability(mealId);
+            toast.success("Meal availability toggled successfully!");
+        } catch {
+            toast.error("Failed to toggle meal availability. Please try again.");
+        } finally {
+            setTogglingId(null);
         }
     };
 
@@ -156,43 +173,58 @@ export default function MealsList({
                             {/* Price */}
                             <div className="mt-4 flex flex-col">
                                 <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
-                                    ${Number(meal.price).toFixed(2)}
+                                    ৳{Number(meal.price).toFixed(2)}
                                 </span>
                                 {meal.discount && (
                                     <span className="text-xs text-red-600 dark:text-red-400 font-semibold">
-                                        Save ${Number(meal.discount).toFixed(2)}
+                                        Save ৳{Number(meal.discount).toFixed(2)}
                                     </span>
                                 )}
                             </div>
                         </div>
                     </Link>
 
-                    <div className="flex items-center justify-between gap-2 border-t border-slate-200 p-4 dark:border-slate-700">
-                        <div className="flex gap-2">
-                            <Button asChild variant="outline" size="sm" className="h-8 rounded-lg px-3">
+                    <div className="grid grid-cols-2 gap-2 border-t border-slate-200 p-4 dark:border-slate-700">
+                        <Button asChild variant="outline" size="sm" className="h-8 w-full rounded-lg px-3">
                                 <Link href={`/provider/menu/${meal.id ?? meal._id}`}>
                                     <Eye className="mr-1 h-4 w-4" /> View
                                 </Link>
-                            </Button>
-                            <Button asChild variant="outline" size="sm" className="h-8 rounded-lg px-3">
+                        </Button>
+                        <Button asChild variant="outline" size="sm" className="h-8 w-full rounded-lg px-3">
                                 <Link href={`/provider/menu/${meal.id ?? meal._id}/edit`}>
                                     <Edit className="mr-1 h-4 w-4" /> Edit
                                 </Link>
+                        </Button>
+
+                        {onToggleAvailability && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleToggleAvailability(meal._id)}
+                                className={`h-8 w-full rounded-lg px-3 ${
+                                    meal.availabilityStatus === "UNAVAILABLE"
+                                        ? "border-amber-200 text-amber-600 hover:bg-amber-50 dark:border-amber-700 dark:hover:bg-amber-900"
+                                        : "border-green-200 text-green-600 hover:bg-green-50 dark:border-green-700 dark:hover:bg-green-900"
+                                }`}
+                                disabled={isLoading || togglingId === meal._id}
+                                title={meal.availabilityStatus === "UNAVAILABLE" ? "Mark as Available" : "Mark as Unavailable"}
+                            >
+                                {meal.availabilityStatus === "UNAVAILABLE" ? "Make Active" : "Make Inactive"}
                             </Button>
-                        </div>
+                        )}
 
                         {onDelete && (
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleDelete(meal._id)}
-                                className="h-8 rounded-lg border-red-200 px-3 text-red-600 hover:bg-red-50 dark:border-red-700 dark:hover:bg-red-900"
+                                className="h-8 w-full rounded-lg border-red-200 px-3 text-red-600 hover:bg-red-50 dark:border-red-700 dark:hover:bg-red-900"
                                 disabled={isLoading || deletingId === meal._id}
                             >
                                 <Trash2 className="mr-1 h-4 w-4" /> Delete
                             </Button>
                         )}
-                        </div>
+                    </div>
                 </div>
             ))}
         </div>

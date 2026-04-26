@@ -1,10 +1,12 @@
-import { OrderStatus, PaymentMethod, Role } from "../../../generated/prisma/enums";
+import { OrderStatus, PaymentMethod, PaymentStatus, Role } from "../../../generated/prisma/enums";
 import { Prisma } from "../../../generated/prisma/client";
+import Stripe from "stripe";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../errors/appError";
 import { pagination } from "../../utils/pagination";
 import { searching } from "../../utils/searching";
 import { filtering } from "../../utils/filtering";
+import { config } from "../../config";
 
 type CreateOrderPayload = {
   fullName?: string;
@@ -28,7 +30,23 @@ type UpdateProviderOrderStatusPayload = {
   orderStatus: keyof typeof OrderStatus;
 };
 
-const createOrder = async (payload: CreateOrderPayload, userEmail: string) => {
+type DeliveryAddressInput = {
+  fullName?: string;
+  phoneNumber?: string;
+  city?: string;
+  area?: string;
+  streetAddress?: string;
+  deliveryInstructions?: string;
+};
+
+type StripeCheckoutPayload = {
+  deliveryAddress?: DeliveryAddressInput;
+};
+
+const stripeSecretKey = config.stripeSecretKey;
+const stripeClient = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
+
+const resolveDeliveryAddress = (payload: CreateOrderPayload | StripeCheckoutPayload) => {
   const deliveryAddressPayload = payload.deliveryAddress ?? {};
 
   const fullName = payload.fullName ?? deliveryAddressPayload.fullName;
@@ -42,6 +60,17 @@ const createOrder = async (payload: CreateOrderPayload, userEmail: string) => {
     throw new AppError(400, "Delivery address is incomplete");
   }
 
+  return {
+    fullName,
+    phoneNumber,
+    city,
+    area,
+    streetAddress,
+    deliveryInstructions,
+  };
+};
+
+const getCartItemsOrThrow = async (userEmail: string) => {
   const cartItems = await prisma.cart.findMany({
     where: { userEmail },
     include: {
@@ -50,6 +79,7 @@ const createOrder = async (payload: CreateOrderPayload, userEmail: string) => {
           id: true,
           name: true,
           price: true,
+          image: true,
         },
       },
     },
@@ -58,6 +88,13 @@ const createOrder = async (payload: CreateOrderPayload, userEmail: string) => {
   if (!cartItems.length) {
     throw new AppError(400, "Cart is empty");
   }
+
+  return cartItems;
+};
+
+const createOrder = async (payload: CreateOrderPayload, userEmail: string) => {
+  const { fullName, phoneNumber, city, area, streetAddress, deliveryInstructions } = resolveDeliveryAddress(payload);
+  const cartItems = await getCartItemsOrThrow(userEmail);
 
   const subtotal = cartItems.reduce((acc, item) => {
     return acc + Number(item.meal.price) * item.quantity;
@@ -117,6 +154,176 @@ const createOrder = async (payload: CreateOrderPayload, userEmail: string) => {
   });
 
   return order;
+};
+
+const createStripeCheckoutSession = async (payload: StripeCheckoutPayload, userEmail: string) => {
+  if (!stripeClient) {
+    throw new AppError(500, "Stripe is not configured on server");
+  }
+
+  const { fullName, phoneNumber, city, area, streetAddress, deliveryInstructions } = resolveDeliveryAddress(payload);
+  const cartItems = await getCartItemsOrThrow(userEmail);
+
+  const subtotal = cartItems.reduce((acc, item) => {
+    return acc + Number(item.meal.price) * item.quantity;
+  }, 0);
+  const deliveryFee = 120;
+  const total = subtotal + deliveryFee;
+
+  const order = await prisma.order.create({
+    data: {
+      userEmail,
+      subtotal,
+      deliveryFee,
+      total,
+      paymentMethod: PaymentMethod.ONLINE_PAYMENT,
+      paymentStatus: PaymentStatus.PENDING,
+      items: {
+        create: cartItems.map((item) => ({
+          mealId: item.mealId,
+          quantity: item.quantity,
+          price: Number(item.meal.price),
+        })),
+      },
+      deliveryAddress: {
+        create: {
+          fullName,
+          phoneNumber,
+          city,
+          area,
+          streetAddress,
+          deliveryInstructions: deliveryInstructions ?? null,
+        },
+      },
+    },
+  });
+
+  const successUrl = `${config.clientUrl ?? "http://localhost:3000"}/checkout?payment=success&session_id={CHECKOUT_SESSION_ID}`;
+  const cancelUrl = `${config.clientUrl ?? "http://localhost:3000"}/checkout?payment=cancelled`;
+
+  const session = await stripeClient.checkout.sessions.create({
+    mode: "payment",
+    line_items: [
+      ...cartItems.map((item) => ({
+        quantity: item.quantity,
+        price_data: {
+          currency: "bdt",
+          unit_amount: Math.round(Number(item.meal.price) * 100),
+          product_data: {
+            name: item.meal.name,
+            description: `Quantity: ${item.quantity} • Freshly prepared by CraveDash partner`,
+            ...(item.meal.image && /^https?:\/\//.test(item.meal.image)
+              ? { images: [item.meal.image] }
+              : {}),
+          },
+        },
+      })),
+      {
+        quantity: 1,
+        price_data: {
+          currency: "bdt",
+          unit_amount: Math.round(deliveryFee * 100),
+          product_data: {
+            name: "Delivery Fee",
+          },
+        },
+      },
+    ],
+    success_url: successUrl,
+    cancel_url: cancelUrl,
+    customer_email: userEmail,
+    custom_text: {
+      submit: {
+        message: "Your order will be confirmed instantly after payment.",
+      },
+    },
+    metadata: {
+      orderId: order.id,
+      userEmail,
+      itemCount: String(cartItems.length),
+    },
+    payment_intent_data: {
+      metadata: {
+        orderId: order.id,
+        userEmail,
+      },
+      description: `CraveDash order ${order.id}`,
+    },
+  });
+
+  return {
+    checkoutUrl: session.url,
+    sessionId: session.id,
+  };
+};
+
+const confirmStripeCheckoutSession = async (sessionId: string, userEmail: string) => {
+  if (!stripeClient) {
+    throw new AppError(500, "Stripe is not configured on server");
+  }
+  if (!sessionId) {
+    throw new AppError(400, "Stripe session id is required");
+  }
+
+  const session = await stripeClient.checkout.sessions.retrieve(sessionId);
+  const orderId = session.metadata?.orderId;
+  const sessionUserEmail = session.metadata?.userEmail;
+
+  if (!orderId || !sessionUserEmail || sessionUserEmail !== userEmail) {
+    throw new AppError(400, "Invalid Stripe session");
+  }
+
+  if (session.payment_status !== "paid") {
+    throw new AppError(400, "Payment is not completed");
+  }
+
+  const order = await prisma.order.findFirst({
+    where: {
+      id: orderId,
+      userEmail,
+    },
+  });
+
+  if (!order) {
+    throw new AppError(404, "Order not found for this payment");
+  }
+
+  if (order.paymentStatus === PaymentStatus.PAID) {
+    return order;
+  }
+
+  const updatedOrder = await prisma.$transaction(async (tx) => {
+    const paidOrder = await tx.order.update({
+      where: { id: orderId },
+      data: {
+        paymentStatus: PaymentStatus.PAID,
+      },
+      include: {
+        items: {
+          include: {
+            meal: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+                price: true,
+                providerEmail: true,
+              },
+            },
+          },
+        },
+        deliveryAddress: true,
+      },
+    });
+
+    await tx.cart.deleteMany({
+      where: { userEmail },
+    });
+
+    return paidOrder;
+  });
+
+  return updatedOrder;
 };
 
 const getMyOrders = async (userEmail: string, query: Record<string, unknown>) => {
@@ -611,6 +818,8 @@ const updateProviderOrderStatus = async (
 
 export const OrderService = {
   createOrder,
+  createStripeCheckoutSession,
+  confirmStripeCheckoutSession,
   getMyOrders,
   getProvidersOrders,
   getAdminOrders,

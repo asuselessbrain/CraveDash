@@ -131,7 +131,7 @@ const Navbar = () => {
     <div className="flex flex-col">
       {/* Scroll Progress Bar */}
       <div
-        className="fixed inset-x-0 top-0 z-50 h-0.5 bg-blue-500 dark:bg-blue-400"
+        className="fixed inset-x-0 top-0 z-50 h-0.5 bg-orange-500 dark:bg-orange-400"
         style={{ width: `${percent}%` }}
       />
 
@@ -149,7 +149,15 @@ const Navbar = () => {
               width={164}
               height={40}
               priority
-              className="h-10 w-auto object-contain dark:brightness-90"
+              className="h-10 w-auto object-contain dark:hidden"
+            />
+            <Image
+              src="/app/cravedash-logo-dark.svg"
+              alt="CraveDash Logo"
+              width={164}
+              height={40}
+              priority
+              className="hidden h-10 w-auto object-contain dark:block"
             />
           </Link>
 

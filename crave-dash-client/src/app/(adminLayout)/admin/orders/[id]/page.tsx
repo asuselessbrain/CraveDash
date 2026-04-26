@@ -186,7 +186,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
                 <aside className="space-y-6 rounded-3xl border border-orange-200/70 bg-white/90 p-6 shadow-sm dark:border-orange-400/20 dark:bg-slate-900/90">
                     <div>
                         <h2 className="text-lg font-extrabold text-slate-900 dark:text-slate-100">Total Amount</h2>
-                        <p className="mt-2 text-3xl font-black text-orange-600 dark:text-orange-300">${total.toFixed(2)}</p>
+                        <p className="mt-2 text-3xl font-black text-orange-600 dark:text-orange-300">৳{total.toFixed(2)}</p>
                     </div>
                     <div>
                         <h2 className="text-lg font-extrabold text-slate-900 dark:text-slate-100">Quick Info</h2>

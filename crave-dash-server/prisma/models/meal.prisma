@@ -23,6 +23,7 @@ model Meal {
     updatedAt          DateTime               @updatedAt
     carts              cart[]
     orderItems         OrderItem[]
+    reviews            Review[]
     providerEmail      String
     provider           User                   @relation(fields: [providerEmail], references: [email])
 

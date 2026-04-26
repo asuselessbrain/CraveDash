@@ -7,6 +7,7 @@ export interface QueryParams {
     cuisineId?: string | undefined;
     mealType?: string | undefined;
     dietaryTag?: string | undefined;
+    availabilityStatus?: string | undefined;
     semester?: string | undefined;
     role?: string | undefined;
     status?: string | undefined;

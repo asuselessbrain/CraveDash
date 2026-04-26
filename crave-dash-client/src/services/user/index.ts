@@ -3,6 +3,11 @@ import { baseApi } from "../baseApi";
 import { QueryParams } from "@/types";
 import { revalidateTag } from "next/cache";
 
+export const getMyProfile = async () => {
+  const res = await baseApi("user/me", "GET", undefined, undefined, "");
+  return res;
+};
+
 
 export const getAdminUsers = async (queryParams?: QueryParams) => {
   const params = new URLSearchParams();

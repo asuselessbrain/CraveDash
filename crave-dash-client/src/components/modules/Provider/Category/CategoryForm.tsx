@@ -8,7 +8,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { uploadImageClientSide } from "../../shared/ReusableImageUploaderFunction";
 import { toast } from "sonner";
-import { createCategory } from "@/services/category";
+import { createCategory, updateCategory } from "@/services/category";
 
 type CategoryForm = {
     id?: string;
@@ -25,12 +25,23 @@ const emptyForm: CategoryForm = {
     image: "/categories/pizza.svg",
 };
 
-export default function CategoryForm({ cuisineOptions }: { cuisineOptions: CuisineOption[] }) {
+type CategoryFormProps = {
+    cuisineOptions: CuisineOption[];
+    initialData?: CategoryForm;
+};
 
-    const [form, setForm] = useState<CategoryForm>(emptyForm);
+export default function CategoryForm({ cuisineOptions, initialData }: CategoryFormProps) {
+
+    const [form, setForm] = useState<CategoryForm>(initialData ? {
+        id: initialData.id,
+        name: initialData.name,
+        cuisineId: initialData.cuisineId,
+        image: initialData.image || emptyForm.image,
+    } : emptyForm);
     const [isUploading, setIsUploading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const closeRef = useRef<HTMLButtonElement>(null);
+    const isEditMode = Boolean(form.id);
 
     const getCuisineId = (cuisine: CuisineOption) => cuisine.id ?? cuisine._id ?? "";
 
@@ -70,22 +81,26 @@ export default function CategoryForm({ cuisineOptions }: { cuisineOptions: Cuisi
         };
 
         setIsSubmitting(true);
+        try {
+            const result = isEditMode && form.id
+                ? await updateCategory(form.id, nextCategory)
+                : await createCategory(nextCategory);
 
-        const res = await createCategory(nextCategory)
+            if (result?.success) {
+                toast.success(result.message || (isEditMode ? "Category updated successfully!" : "Category saved successfully!"));
+                if (!isEditMode) {
+                    setForm(emptyForm);
+                }
+                closeRef.current?.click();
+                return;
+            }
 
-        if (res.success) {
-            toast.success(res.message || "Category saved successfully!");
-            setForm(emptyForm);
-            closeRef.current?.click();
+            toast.error(result?.errorMessage || (isEditMode ? "Failed to update category. Please try again." : "Failed to save category. Please try again."));
+        } catch {
+            toast.error(isEditMode ? "Something went wrong while updating category." : "Something went wrong while saving category.");
+        } finally {
             setIsSubmitting(false);
-            return;
         }
-        else {
-            toast.error(res.errorMessage || "Failed to save category. Please try again.");
-            setIsSubmitting(false);
-        }
-
-
     };
 
     const isActionDisabled = isUploading || isSubmitting || !form.name.trim() || !form.cuisineId;
@@ -93,7 +108,7 @@ export default function CategoryForm({ cuisineOptions }: { cuisineOptions: Cuisi
     return (
         <DialogContent className="max-w-[calc(100%-1rem)] sm:max-w-lg">
             <DialogHeader>
-                <DialogTitle>{form.id ? "Edit Category" : "Add New Category"}</DialogTitle>
+                <DialogTitle>{isEditMode ? "Edit Category" : "Add New Category"}</DialogTitle>
                 <DialogDescription>Create or update a category name and image.</DialogDescription>
             </DialogHeader>
 
@@ -152,7 +167,7 @@ export default function CategoryForm({ cuisineOptions }: { cuisineOptions: Cuisi
                             <Loader2 className="h-4 w-4 animate-spin" /> Saving...
                         </>
                     ) : (
-                        "Save Category"
+                        isEditMode ? "Update Category" : "Save Category"
                     )}
                 </Button>
             </DialogFooter>

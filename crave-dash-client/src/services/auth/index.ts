@@ -14,7 +14,7 @@ export const signInUser = async (data: FieldValues) => {
   const cookieStore = await cookies()
   try {
     const res = await fetch(
-      "http://localhost:5000/api/v1/auth/login",
+      "https://crave-dash-beta.vercel.app/api/v1/auth/login",
       {
         method: "POST",
         headers: {
@@ -39,7 +39,7 @@ export const signUpUser = async (data: FieldValues) => {
   const cookieStore = await cookies()
   try {
     const res = await fetch(
-      "http://localhost:5000/api/v1/user/customers",
+      "https://crave-dash-beta.vercel.app/api/v1/user/customers",
       {
         method: "POST",
         headers: {
@@ -64,7 +64,7 @@ export const signUpUser = async (data: FieldValues) => {
 export const forgotPassword = async (email: FieldValues) => {
   try {
     const res = await fetch(
-      "http://localhost:5000/api/v1/auth/forgot-password",
+      "https://crave-dash-beta.vercel.app/api/v1/auth/forgot-password",
       {
         method: "PATCH",
         headers: {
@@ -84,7 +84,7 @@ export const forgotPassword = async (email: FieldValues) => {
 export const resetPassword = async (data: FieldValues) => {
   try {
     const res = await fetch(
-      "http://localhost:5000/api/v1/auth/reset-password",
+      "https://crave-dash-beta.vercel.app/api/v1/auth/reset-password",
       {
         method: "PATCH",
         headers: {

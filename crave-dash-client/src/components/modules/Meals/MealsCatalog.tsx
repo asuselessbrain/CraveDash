@@ -267,7 +267,7 @@ export default function MealsCatalog({ meals, meta, categories, cuisines }: Meal
                                         <div className="absolute inset-0 bg-linear-to-t from-slate-900/65 via-slate-900/20 to-transparent" />
 
                                         <div className="absolute right-3 top-3 inline-flex items-center rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-orange-600 shadow dark:bg-slate-900/95 dark:text-orange-300">
-                                            ${meal.price}
+                                            ৳{meal.price}
                                         </div>
 
                                         {meal.discount > 0 && (

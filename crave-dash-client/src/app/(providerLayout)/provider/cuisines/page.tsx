@@ -19,9 +19,9 @@ type CuisineActionResult = {
 };
 
 const statusFilters: Array<{ label: string; value?: string }> = [
-        { label: "All" },
-        { label: "Active", value: "ACTIVE" },
-        { label: "Inactive", value: "INACTIVE" },
+    { label: "All" },
+    { label: "Active", value: "ACTIVE" },
+    { label: "Inactive", value: "INACTIVE" },
 ];
 
 function buildStatusHref(params: {
@@ -47,100 +47,101 @@ function buildStatusHref(params: {
 
 
 
-export default async function ProviderCuisinesPage({searchParams}: {
-  searchParams: Promise<{
-    page?: string;
-    searchTerm?: string;
-    status?: string;
-    sortBy?: string;
-    sortOrder?: "asc" | "desc";
-  }>;
+export default async function ProviderCuisinesPage({ searchParams }: {
+    searchParams: Promise<{
+        page?: string;
+        searchTerm?: string;
+        status?: string;
+        sortBy?: string;
+        sortOrder?: "asc" | "desc";
+    }>;
 }) {
-const resolvedSearchParams = await searchParams;
-const currentPage = Math.max(1, Number(resolvedSearchParams.page ?? 1) || 1);
+    const resolvedSearchParams = await searchParams;
+    const currentPage = Math.max(1, Number(resolvedSearchParams.page ?? 1) || 1);
 
-const cuisines = await getProviderCuisines({
+    const cuisines = await getProviderCuisines({
         searchTerm: resolvedSearchParams.searchTerm,
-    skip: currentPage - 1,
+        skip: currentPage - 1,
+        take: 12,
         status: resolvedSearchParams.status,
         sortBy: resolvedSearchParams.sortBy,
         sortOrder: resolvedSearchParams.sortOrder,
-})
+    })
 
-const cuisinesList = cuisines.data?.data ?? [];
+    const cuisinesList = cuisines.data?.data ?? [];
 
-async function toggleCuisineStatusAction(formData: FormData) {
-    "use server";
+    async function toggleCuisineStatusAction(formData: FormData) {
+        "use server";
 
-    const cuisineId = String(formData.get("cuisineId") || "").trim();
-    const nextStatus = String(formData.get("nextStatus") || "").trim();
+        const cuisineId = String(formData.get("cuisineId") || "").trim();
+        const nextStatus = String(formData.get("nextStatus") || "").trim();
 
-    if (!cuisineId || (nextStatus !== "ACTIVE" && nextStatus !== "INACTIVE")) {
-        return {
-            success: false,
-            message: "Invalid cuisine or status.",
-        } satisfies CuisineActionResult;
-    }
-
-    try {
-        const result = await updateCuisine(cuisineId, { status: nextStatus as ProviderCuisineStatus });
-
-        if (result?.success === false) {
+        if (!cuisineId || (nextStatus !== "ACTIVE" && nextStatus !== "INACTIVE")) {
             return {
                 success: false,
-                message: result?.errorMessage || "Failed to update cuisine status.",
+                message: "Invalid cuisine or status.",
             } satisfies CuisineActionResult;
         }
 
-        revalidatePath("/provider/cuisines");
+        try {
+            const result = await updateCuisine(cuisineId, { status: nextStatus as ProviderCuisineStatus });
 
-        return {
-            success: true,
-            message: result?.message || "Cuisine status updated successfully!",
-        } satisfies CuisineActionResult;
-    } catch {
-        return {
-            success: false,
-            message: "Something went wrong while updating cuisine status.",
-        } satisfies CuisineActionResult;
-    }
-}
+            if (result?.success === false) {
+                return {
+                    success: false,
+                    message: result?.errorMessage || "Failed to update cuisine status.",
+                } satisfies CuisineActionResult;
+            }
 
-async function deleteCuisineAction(formData: FormData) {
-    "use server";
+            revalidatePath("/provider/cuisines");
 
-    const cuisineId = String(formData.get("cuisineId") || "").trim();
-
-    if (!cuisineId) {
-        return {
-            success: false,
-            message: "Invalid cuisine id.",
-        } satisfies CuisineActionResult;
-    }
-
-    try {
-        const result = await deleteCuisine(cuisineId);
-
-        if (result?.success === false) {
+            return {
+                success: true,
+                message: result?.message || "Cuisine status updated successfully!",
+            } satisfies CuisineActionResult;
+        } catch {
             return {
                 success: false,
-                message: result?.errorMessage || "Failed to delete cuisine.",
+                message: "Something went wrong while updating cuisine status.",
+            } satisfies CuisineActionResult;
+        }
+    }
+
+    async function deleteCuisineAction(formData: FormData) {
+        "use server";
+
+        const cuisineId = String(formData.get("cuisineId") || "").trim();
+
+        if (!cuisineId) {
+            return {
+                success: false,
+                message: "Invalid cuisine id.",
             } satisfies CuisineActionResult;
         }
 
-        revalidatePath("/provider/cuisines");
+        try {
+            const result = await deleteCuisine(cuisineId);
 
-        return {
-            success: true,
-            message: result?.message || "Cuisine deleted successfully!",
-        } satisfies CuisineActionResult;
-    } catch {
-        return {
-            success: false,
-            message: "Something went wrong while deleting cuisine.",
-        } satisfies CuisineActionResult;
+            if (result?.success === false) {
+                return {
+                    success: false,
+                    message: result?.errorMessage || "Failed to delete cuisine.",
+                } satisfies CuisineActionResult;
+            }
+
+            revalidatePath("/provider/cuisines");
+
+            return {
+                success: true,
+                message: result?.message || "Cuisine deleted successfully!",
+            } satisfies CuisineActionResult;
+        } catch {
+            return {
+                success: false,
+                message: "Something went wrong while deleting cuisine.",
+            } satisfies CuisineActionResult;
+        }
     }
-}
 
     return (
         <div className="space-y-6">
@@ -210,58 +211,59 @@ async function deleteCuisineAction(formData: FormData) {
                         const cuisineId = cuisine.id ?? (cuisine as { _id?: string })._id;
 
                         return (
-                        <article key={cuisine.id} className="overflow-hidden rounded-2xl border border-orange-200/70 bg-white/90 shadow-sm dark:border-orange-400/20 dark:bg-slate-900/90">
-                            <div className="relative h-32 w-full">
-                                <Image src={cuisine.image} alt={cuisine.name} fill sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover" />
-                            </div>
-                            <div className="p-4">
-                                <div className="flex items-start justify-between gap-3">
-                                    <div>
-                                        <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">{cuisine.name}</h2>
-                                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{categoriesCount} categories • {mealsCount} meals</p>
-                                    </div>
-                                    <span className={`rounded-full px-2 py-1 text-xs font-bold whitespace-nowrap ${cuisine.status === "ACTIVE" ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300" : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"}`}>
-                                        {cuisine.status}
-                                    </span>
+                            <article key={cuisine.id} className="overflow-hidden rounded-2xl border border-orange-200/70 bg-white/90 shadow-sm dark:border-orange-400/20 dark:bg-slate-900/90">
+                                <div className="relative h-32 w-full">
+                                    <Image src={cuisine.image} alt={cuisine.name} fill sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover" />
                                 </div>
+                                <div className="p-4">
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div>
+                                            <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">{cuisine.name}</h2>
+                                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{categoriesCount} categories • {mealsCount} meals</p>
+                                        </div>
+                                        <span className={`rounded-full px-2 py-1 text-xs font-bold whitespace-nowrap ${cuisine.status === "ACTIVE" ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300" : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"}`}>
+                                            {cuisine.status}
+                                        </span>
+                                    </div>
 
-                                <div className="mt-4 flex gap-2">
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button variant="outline" size="sm" className="rounded-xl flex-1"><Pencil className="h-4 w-4" /> Edit</Button>
-                                        </DialogTrigger>
-                                        {cuisineId ? (
-                                            <CuisineForm
-                                                initialData={{
-                                                    id: cuisineId,
-                                                    name: cuisine.name,
-                                                    image: cuisine.image,
-                                                }}
-                                            />
-                                        ) : (
-                                            <CuisineForm />
-                                        )}
-                                    </Dialog>
+                                    <div className="mt-4 flex gap-2">
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button variant="outline" size="sm" className="rounded-xl flex-1"><Pencil className="h-4 w-4" /> Edit</Button>
+                                            </DialogTrigger>
+                                            {cuisineId ? (
+                                                <CuisineForm
+                                                    initialData={{
+                                                        id: cuisineId,
+                                                        name: cuisine.name,
+                                                        image: cuisine.image,
+                                                    }}
+                                                />
+                                            ) : (
+                                                <CuisineForm />
+                                            )}
+                                        </Dialog>
+                                        <CuisineActions
+                                            cuisineId={cuisineId}
+                                            status={cuisine.status}
+                                            onDeleteAction={deleteCuisineAction}
+                                            onToggleStatusAction={toggleCuisineStatusAction}
+                                            showToggle={false}
+                                            containerClassName="flex-1"
+                                        />
+                                    </div>
                                     <CuisineActions
                                         cuisineId={cuisineId}
                                         status={cuisine.status}
                                         onDeleteAction={deleteCuisineAction}
                                         onToggleStatusAction={toggleCuisineStatusAction}
-                                        showToggle={false}
-                                        containerClassName="flex-1"
+                                        showDelete={false}
+                                        containerClassName="mt-2 w-full"
                                     />
                                 </div>
-                                <CuisineActions
-                                    cuisineId={cuisineId}
-                                    status={cuisine.status}
-                                    onDeleteAction={deleteCuisineAction}
-                                    onToggleStatusAction={toggleCuisineStatusAction}
-                                    showDelete={false}
-                                    containerClassName="mt-2 w-full"
-                                />
-                            </div>
-                        </article>
-                    )})}
+                            </article>
+                        )
+                    })}
                 </section>
             )}
             <PaginationComponent totalPage={cuisines.data.meta.totalPages} />

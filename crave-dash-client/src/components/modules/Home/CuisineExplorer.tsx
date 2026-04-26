@@ -48,7 +48,7 @@ export default function CuisineExplorer({ items }: { items?: Cuisine[] }) {
 					{cuisines.map((cuisine) => (
 						<Link
 							key={cuisine.id}
-							href={`/meals?cuisine=${cuisine.slug || toSlug(cuisine.name)}`}
+							href={`/meals?cuisine=${cuisine.id || toSlug(cuisine.name)}`}
 							className="group relative aspect-4/5 overflow-hidden rounded-3xl border border-white/60 shadow-md shadow-black/10 sm:aspect-3/4"
 						>
 							<Image

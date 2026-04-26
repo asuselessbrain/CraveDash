@@ -6,7 +6,7 @@ type CreateOrderPayload = {
     mealId?: string;
     quantity: number;
   }>;
-  paymentMethod: "CASH_ON_DELIVERY" | string;
+  paymentMethod: "CASH_ON_DELIVERY" | "ONLINE_PAYMENT" | string;
   deliveryAddress: {
     fullName: string;
     phoneNumber: string;
@@ -25,6 +25,20 @@ type CreateOrderPayload = {
 
 export const createOrder = async (data: CreateOrderPayload) => {
   const result = await baseApi("order", "POST", data);
+  return result;
+};
+
+type StripeCheckoutPayload = {
+  deliveryAddress: CreateOrderPayload["deliveryAddress"];
+};
+
+export const createStripeCheckoutSession = async (data: StripeCheckoutPayload) => {
+  const result = await baseApi("order/stripe/session", "POST", data);
+  return result;
+};
+
+export const confirmStripeCheckoutSession = async (sessionId: string) => {
+  const result = await baseApi("order/stripe/confirm", "POST", { sessionId }, undefined, "orders");
   return result;
 };
 

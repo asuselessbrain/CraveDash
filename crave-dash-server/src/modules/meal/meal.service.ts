@@ -23,7 +23,7 @@ const createMeal = async (payload: Prisma.MealUncheckedCreateInput, email: strin
     return result;
 };
 
-const getProvidersMeals = async (query: Record<string, unknown>) => {
+const getProvidersMeals = async (providerEmail: string, query: Record<string, unknown>) => {
     const { searchTerm, skip, take, sortBy, sortOrder, availabilityStatus, mealType, dietaryTag, spiceLevel, categoryId, cuisineId } = query;
     const allowedSortFields: Array<keyof Prisma.MealOrderByWithRelationInput> = [
         "id",
@@ -54,7 +54,9 @@ const getProvidersMeals = async (query: Record<string, unknown>) => {
     }
 
     // Apply additional field filtering
-    const filterData: Record<string, any> = {};
+    const filterData: Record<string, any> = {
+        providerEmail,
+    };
     if (availabilityStatus) filterData.availabilityStatus = availabilityStatus;
     if (mealType) filterData.mealType = mealType;
     if (dietaryTag) filterData.dietaryTag = dietaryTag;
@@ -181,6 +183,7 @@ const getMealById = async (id: string) => {
     });
     return result;
 };
+import AppError from "../../errors/appError";
 
 const updateMeal = async (id: string, payload: Prisma.MealUncheckedUpdateInput) => {
     const result = await prisma.meal.update({
@@ -199,6 +202,100 @@ const deleteMeal = async (id: string) => {
     return result;
 };
 
+const updateMealWithAuth = async (
+    id: string,
+    userEmail: string,
+    userRole: string,
+    payload: Prisma.MealUncheckedUpdateInput
+) => {
+    const meal = await prisma.meal.findUnique({
+        where: { id },
+    });
+
+    if (!meal) {
+        throw new AppError(404, "Meal not found");
+    }
+
+    const isAdmin = userRole === "ADMIN";
+    const isOwnerProvider = meal.providerEmail === userEmail;
+
+    if (!isAdmin && !isOwnerProvider) {
+        throw new AppError(403, "You don't have permission to update this meal");
+    }
+
+    const { providerEmail: _ignoredProviderEmail, ...restPayload } =
+        payload as Record<string, unknown>;
+    const safePayload: Prisma.MealUncheckedUpdateInput =
+        restPayload as Prisma.MealUncheckedUpdateInput;
+
+    const result = await prisma.meal.update({
+        where: { id },
+        data: safePayload,
+        include: mealInclude,
+    });
+
+    return result;
+};
+
+const deleteMealWithAuth = async (
+    id: string,
+    userEmail: string,
+    userRole: string
+) => {
+    const meal = await prisma.meal.findUnique({
+        where: { id },
+    });
+
+    if (!meal) {
+        throw new AppError(404, "Meal not found");
+    }
+
+    const isAdmin = userRole === "ADMIN";
+    const isOwnerProvider = meal.providerEmail === userEmail;
+
+    if (!isAdmin && !isOwnerProvider) {
+        throw new AppError(403, "You don't have permission to delete this meal");
+    }
+
+    const result = await prisma.meal.delete({
+        where: { id },
+        include: mealInclude,
+    });
+
+    return result;
+};
+
+const toggleAvailability = async (
+    id: string,
+    userEmail: string,
+    userRole: string
+) => {
+    const meal = await prisma.meal.findUnique({
+        where: { id },
+    });
+
+    if (!meal) {
+        throw new AppError(404, "Meal not found");
+    }
+
+    const isAdmin = userRole === "ADMIN";
+    const isOwnerProvider = meal.providerEmail === userEmail;
+
+    if (!isAdmin && !isOwnerProvider) {
+        throw new AppError(403, "You don't have permission to toggle this meal's availability");
+    }
+
+    const newStatus = meal.availabilityStatus === "AVAILABLE" ? "UNAVAILABLE" : "AVAILABLE";
+
+    const result = await prisma.meal.update({
+        where: { id },
+        data: { availabilityStatus: newStatus },
+        include: mealInclude,
+    });
+
+    return result;
+};
+
 export const MealService = {
     createMeal,
     getProvidersMeals,
@@ -206,4 +303,7 @@ export const MealService = {
     getMealById,
     updateMeal,
     deleteMeal,
+    updateMealWithAuth,
+    deleteMealWithAuth,
+    toggleAvailability,
 };

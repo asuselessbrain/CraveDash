@@ -27,6 +27,16 @@ const createCustomer = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
+const getMyProfile = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
+    const result = await UserService.getMyProfile(req.user.email);
+
+    res.status(200).json({
+        success: true,
+        message: "User profile retrieved successfully",
+        data: result
+    })
+})
+
 const getAdminUsers = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
     const result = await UserService.getAdminUsers(req.query);
 
@@ -81,6 +91,7 @@ const blockUserByAdmin = catchAsync(async (req: AuthenticatedRequest, res: Respo
 })
 
 export const UserController = {
+    getMyProfile,
     createCustomer,
     getAdminUsers,
     getAdminUserById,

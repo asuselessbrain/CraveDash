@@ -85,8 +85,8 @@ export default function FeaturedCombos() {
 						</ul>
 
 						<div className="mt-4 flex items-end gap-2">
-							<span className="text-sm text-slate-500 line-through dark:text-slate-400">${combo.originalTotal.toFixed(2)}</span>
-							<span className="text-xl font-extrabold text-orange-600 dark:text-orange-300">${combo.bundlePrice.toFixed(2)}</span>
+							<span className="text-sm text-slate-500 line-through dark:text-slate-400">৳{combo.originalTotal.toFixed(2)}</span>
+							<span className="text-xl font-extrabold text-orange-600 dark:text-orange-300">৳{combo.bundlePrice.toFixed(2)}</span>
 						</div>
 
 						<Button className="mt-4 h-10 w-full rounded-xl bg-orange-500 font-semibold text-white hover:bg-orange-400">

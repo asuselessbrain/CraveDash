@@ -8,7 +8,7 @@ export const baseApi = async (
     queryString?: string,
     tag: string = "default"
 ) => {
-
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "https://crave-dash-beta.vercel.app/api/v1"
     const cookieStore = await cookies()
     const token = cookieStore.get("token")?.value
     const normalizedQuery = queryString ? `?${queryString}` : ""
@@ -27,7 +27,7 @@ export const baseApi = async (
     }
 
     const result = await fetch(
-        `http://localhost:5000/api/v1/${endpoint}${normalizedQuery}`,
+        `${apiBaseUrl}/${endpoint}${normalizedQuery}`,
         options
     );
     return await result.json();

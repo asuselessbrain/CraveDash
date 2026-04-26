@@ -290,7 +290,7 @@ export default async function CustomerOrdersPage({ searchParams }: { searchParam
                                             {order.status}
                                         </span>
                                     </td>
-                                    <td className="px-5 py-4 font-semibold text-slate-900 dark:text-slate-100">${order.total.toFixed(2)}</td>
+                                    <td className="px-5 py-4 font-semibold text-slate-900 dark:text-slate-100">৳{order.total.toFixed(2)}</td>
                                     <td className="px-5 py-4 text-slate-600 dark:text-slate-300">{order.itemsCount}</td>
                                     <td className="px-5 py-4 text-right">
                                         <Button asChild variant="outline" className="rounded-xl">
@@ -323,7 +323,7 @@ export default async function CustomerOrdersPage({ searchParams }: { searchParam
                             <div className="mt-4 grid grid-cols-2 gap-3 text-sm text-slate-600 dark:text-slate-300">
                                 <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-950/60">
                                     <p className="text-xs font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400">Total</p>
-                                    <p className="mt-1 text-base font-bold text-slate-900 dark:text-slate-100">${order.total.toFixed(2)}</p>
+                                    <p className="mt-1 text-base font-bold text-slate-900 dark:text-slate-100">৳{order.total.toFixed(2)}</p>
                                 </div>
                                 <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-950/60">
                                     <p className="text-xs font-semibold tracking-widest uppercase text-slate-500 dark:text-slate-400">Items</p>

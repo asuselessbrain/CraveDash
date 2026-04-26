@@ -118,7 +118,7 @@ export default function CartAction({ cartItems }: { cartItems: CartItemsPayload 
                                     <div className="min-w-0">
                                         <h3 className="truncate text-base font-bold text-slate-900 dark:text-slate-100">{item.meal.name}</h3>
                                         <p className="truncate text-sm text-slate-500 dark:text-slate-400">{item.meal.provider}</p>
-                                        <p className="mt-1 text-sm font-semibold text-orange-600 dark:text-orange-300">${item.meal.price}</p>
+                                        <p className="mt-1 text-sm font-semibold text-orange-600 dark:text-orange-300">৳{item.meal.price}</p>
                                     </div>
                                 </div>
 
@@ -164,20 +164,20 @@ export default function CartAction({ cartItems }: { cartItems: CartItemsPayload 
                 <div className="mt-5 space-y-3 text-sm">
                     <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
                         <span>Subtotal</span>
-                        <span className="font-semibold">${subTotal.toFixed(2)}</span>
+                        <span className="font-semibold">৳{subTotal.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
                         <span>Delivery Fee</span>
-                        <span className="font-semibold">${deliveryCharge.toFixed(2)}</span>
+                        <span className="font-semibold">৳{deliveryCharge.toFixed(2)}</span>
                     </div>
                     {/* <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
 								<span>Tax (5%)</span>
-								<span className="font-semibold">${tax.toFixed(2)}</span>
+								<span className="font-semibold">৳{tax.toFixed(2)}</span>
 							</div> */}
                     <div className="my-2 h-px bg-slate-200 dark:bg-slate-700" />
                     <div className="flex items-center justify-between text-base font-black text-slate-900 dark:text-slate-100">
                         <span>Total</span>
-                        <span>${total.toFixed(2)}</span>
+                        <span>৳{total.toFixed(2)}</span>
                     </div>
                 </div>
 

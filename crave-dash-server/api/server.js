@@ -2,7 +2,7 @@ import {
   app_default,
   config,
   prisma
-} from "./chunk-HLIOPEWS.js";
+} from "./chunk-G37GCC5X.js";
 
 // src/utils/seedAdmin.ts
 import bcrypt from "bcrypt";

@@ -7,6 +7,7 @@ export const config = {
     nodeEnv: process.env.NODE_ENV,
     clientUrl: process.env.CLIENT_URL,
     port: process.env.PORT,
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY,
     saltRounds: process.env.SALT_ROUNDS,
     jwt: {
         secret: process.env.JWT_SECRET,

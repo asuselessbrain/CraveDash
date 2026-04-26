@@ -140,8 +140,8 @@ export default function FlashDeals({ deals }: { deals?: Deal[] }) {
                 <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-slate-100">{deal.name}</h3>
 
                 <div className="mt-2 flex items-end gap-2">
-                  <span className="text-sm text-slate-500 line-through dark:text-slate-400">${deal.originalPrice.toFixed(2)}</span>
-                  <span className="text-lg font-extrabold text-orange-600 dark:text-orange-300">${deal.discountedPrice.toFixed(2)}</span>
+                  <span className="text-sm text-slate-500 line-through dark:text-slate-400">৳{deal.originalPrice.toFixed(2)}</span>
+                  <span className="text-lg font-extrabold text-orange-600 dark:text-orange-300">৳{deal.discountedPrice.toFixed(2)}</span>
                 </div>
 
                 <Button className="mt-4 h-10 w-full rounded-xl bg-orange-500 font-semibold text-white hover:bg-orange-400">

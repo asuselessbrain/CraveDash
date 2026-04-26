@@ -1,17 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { getCategories } from "@/services/category";
+import CategoryForm from "@/components/modules/Provider/Category/CategoryForm";
+import CategoryActions from "@/components/modules/Provider/Category/CategoryActions";
+import { deleteCategory, getCategories, updateCategory } from "@/services/category";
+import { getCuisines } from "@/services/cuisine";
 import Search from "@/components/modules/shared/SearchComponent";
 import SortingComponent from "@/components/modules/shared/SortingComponent";
 import PaginationComponent from "@/components/modules/shared/PaginationComponent";
+import { revalidatePath } from "next/cache";
+import { ProviderCategoryStatus, ProviderCuisine } from "@/app/(providerLayout)/provider/data";
 
 type AdminCategory = {
     id?: string;
     _id?: string;
     name?: string;
+    cuisineId?: string;
     image?: string;
     icon?: string;
     description?: string;
@@ -35,6 +41,11 @@ type SearchParams = {
     status?: string;
     sortBy?: string;
     sortOrder?: "asc" | "desc";
+};
+
+type CategoryActionResult = {
+    success: boolean;
+    message: string;
 };
 
 const statusFilters: Array<{ label: string; value?: string }> = [
@@ -65,6 +76,9 @@ export default async function AdminCategoriesPage({ searchParams }: {
     const resolvedSearchParams = await searchParams;
     const currentPage = Math.max(1, Number(resolvedSearchParams.page ?? 1) || 1);
 
+    const cuisines = await getCuisines();
+    const cuisineOptions = cuisines.data.data as ProviderCuisine[];
+
     const categories = (await getCategories({
         searchTerm: resolvedSearchParams.searchTerm,
         skip: currentPage - 1,
@@ -78,8 +92,81 @@ export default async function AdminCategoriesPage({ searchParams }: {
         displayName: cat.name ?? "Unnamed Category",
         displayImage: cat.image ?? cat.icon ?? "/categories/pizza.svg",
         displayMeals: cat.meals ?? cat.mealsCount ?? 0,
-        displayStatus: cat.status ?? "Active",
+        displayStatus: cat.status ?? "ACTIVE",
     }));
+
+    async function toggleCategoryStatusAction(formData: FormData) {
+        "use server";
+
+        const categoryId = String(formData.get("categoryId") || "").trim();
+        const nextStatus = String(formData.get("nextStatus") || "").trim();
+
+        if (!categoryId || (nextStatus !== "ACTIVE" && nextStatus !== "INACTIVE")) {
+            return {
+                success: false,
+                message: "Invalid category or status.",
+            } satisfies CategoryActionResult;
+        }
+
+        try {
+            const result = await updateCategory(categoryId, { status: nextStatus as ProviderCategoryStatus });
+
+            if (result?.success === false) {
+                return {
+                    success: false,
+                    message: result?.errorMessage || "Failed to update category status.",
+                } satisfies CategoryActionResult;
+            }
+
+            revalidatePath("/admin/categories");
+
+            return {
+                success: true,
+                message: result?.message || "Category status updated successfully!",
+            } satisfies CategoryActionResult;
+        } catch {
+            return {
+                success: false,
+                message: "Something went wrong while updating category status.",
+            } satisfies CategoryActionResult;
+        }
+    }
+
+    async function deleteCategoryAction(formData: FormData) {
+        "use server";
+
+        const categoryId = String(formData.get("categoryId") || "").trim();
+
+        if (!categoryId) {
+            return {
+                success: false,
+                message: "Invalid category id.",
+            } satisfies CategoryActionResult;
+        }
+
+        try {
+            const result = await deleteCategory(categoryId);
+
+            if (result?.success === false) {
+                return {
+                    success: false,
+                    message: result?.errorMessage || "Failed to delete category.",
+                } satisfies CategoryActionResult;
+            }
+
+            revalidatePath("/admin/categories");
+
+            return {
+                success: true,
+                message: result?.message || "Category deleted successfully!",
+            } satisfies CategoryActionResult;
+        } catch {
+            return {
+                success: false,
+                message: "Something went wrong while deleting category.",
+            } satisfies CategoryActionResult;
+        }
+    }
 
     return (
         <div className="space-y-6">
@@ -95,6 +182,7 @@ export default async function AdminCategoriesPage({ searchParams }: {
                             <Plus className="h-4 w-4" /> Add Category
                         </Button>
                     </DialogTrigger>
+                    <CategoryForm cuisineOptions={cuisineOptions} />
                 </Dialog>
             </header>
 
@@ -163,7 +251,7 @@ export default async function AdminCategoriesPage({ searchParams }: {
                                     </div>
                                     <span
                                         className={`rounded-full px-3 py-1 text-xs font-bold ${
-                                            category.displayStatus === "Active"
+                                            category.displayStatus === "ACTIVE"
                                                 ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
                                                 : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
                                         }`}
@@ -173,21 +261,43 @@ export default async function AdminCategoriesPage({ searchParams }: {
                                 </div>
 
                                 <div className="mt-4 flex gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="rounded-xl"
-                                    >
-                                        <Pencil className="h-4 w-4" /> Edit
-                                    </Button>
-                                    <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        className="rounded-xl"
-                                    >
-                                        <Trash2 className="h-4 w-4" /> Delete
-                                    </Button>
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="rounded-xl flex-1"
+                                            >
+                                                <Pencil className="h-4 w-4" /> Edit
+                                            </Button>
+                                        </DialogTrigger>
+                                        <CategoryForm
+                                            cuisineOptions={cuisineOptions}
+                                            initialData={{
+                                                id: category.id ?? category._id,
+                                                name: category.displayName,
+                                                cuisineId: category.cuisineId || "",
+                                                image: category.displayImage,
+                                            }}
+                                        />
+                                    </Dialog>
+                                    <CategoryActions
+                                        categoryId={category.id ?? category._id}
+                                        status={category.displayStatus as ProviderCategoryStatus}
+                                        onDeleteAction={deleteCategoryAction}
+                                        onToggleStatusAction={toggleCategoryStatusAction}
+                                        showToggle={false}
+                                        containerClassName="flex-1"
+                                    />
                                 </div>
+                                <CategoryActions
+                                    categoryId={category.id ?? category._id}
+                                    status={category.displayStatus as ProviderCategoryStatus}
+                                    onDeleteAction={deleteCategoryAction}
+                                    onToggleStatusAction={toggleCategoryStatusAction}
+                                    showDelete={false}
+                                    containerClassName="mt-2 w-full"
+                                />
                             </div>
                         </article>
                     ))}

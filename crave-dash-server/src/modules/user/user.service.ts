@@ -23,6 +23,39 @@ type AdminUpdateUserPayload = {
   status?: UserStatus;
 };
 
+const getMyProfile = async (email: string) => {
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      email: true,
+      role: true,
+      status: true,
+      customer: {
+        select: {
+          fullName: true,
+          phone: true,
+          address: true,
+          city: true,
+        },
+      },
+    },
+  });
+
+  if (!user) {
+    throw new AppError(404, "User not found");
+  }
+
+  return {
+    email: user.email,
+    role: user.role,
+    status: user.status,
+    fullName: user.customer?.fullName ?? "",
+    phoneNumber: user.customer?.phone ?? "",
+    address: user.customer?.address ?? "",
+    city: user.customer?.city ?? "",
+  };
+};
+
 const createCustomer = async (data: CustomerInput) => {
 
   const hashedPassword = await bcrypt.hash(
@@ -343,6 +376,7 @@ const blockUserByAdmin = async (userId: string, adminEmail: string) => {
 };
 
 export const UserService = {
+  getMyProfile,
   createCustomer,
   getAdminUsers,
   getAdminUserById,

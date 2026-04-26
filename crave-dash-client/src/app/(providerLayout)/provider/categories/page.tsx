@@ -1,14 +1,16 @@
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import CategoryForm from "@/components/modules/Provider/Category/CategoryForm";
+import CategoryActions from "@/components/modules/Provider/Category/CategoryActions";
 import { getCuisines } from "@/services/cuisine";
-import { getCategories } from "@/services/category";
+import { deleteCategory, getProviderAllCategories, updateCategory } from "@/services/category";
 import Image from "next/image";
 import Search from "@/components/modules/shared/SearchComponent";
 import SortingComponent from "@/components/modules/shared/SortingComponent";
 import PaginationComponent from "@/components/modules/shared/PaginationComponent";
+import { revalidatePath } from "next/cache";
 import { ProviderCategoryStatus, type ProviderCuisine } from "../data";
 
 type CategoryCard = {
@@ -33,6 +35,11 @@ type CategoryCuisineOption = {
     id?: string;
     _id?: string;
     name: string;
+};
+
+type CategoryActionResult = {
+    success: boolean;
+    message: string;
 };
 
 const statusFilters: Array<{ label: string; value?: string }> = [
@@ -84,13 +91,86 @@ export default async function ProviderCategoriesPage({ searchParams }: {
             .filter((entry): entry is readonly [string, string] => Boolean(entry[0]))
     );
 
-    const categories = (await getCategories({
+    const categories = (await getProviderAllCategories({
         searchTerm: resolvedSearchParams.searchTerm,
         skip: currentPage - 1,
         status: resolvedSearchParams.status,
         sortBy: resolvedSearchParams.sortBy,
         sortOrder: resolvedSearchParams.sortOrder,
     })) as CategoryApiResponse;
+
+    async function toggleCategoryStatusAction(formData: FormData) {
+        "use server";
+
+        const categoryId = String(formData.get("categoryId") || "").trim();
+        const nextStatus = String(formData.get("nextStatus") || "").trim();
+
+        if (!categoryId || (nextStatus !== "ACTIVE" && nextStatus !== "INACTIVE")) {
+            return {
+                success: false,
+                message: "Invalid category or status.",
+            } satisfies CategoryActionResult;
+        }
+
+        try {
+            const result = await updateCategory(categoryId, { status: nextStatus as ProviderCategoryStatus });
+
+            if (result?.success === false) {
+                return {
+                    success: false,
+                    message: result?.errorMessage || "Failed to update category status.",
+                } satisfies CategoryActionResult;
+            }
+
+            revalidatePath("/provider/categories");
+
+            return {
+                success: true,
+                message: result?.message || "Category status updated successfully!",
+            } satisfies CategoryActionResult;
+        } catch {
+            return {
+                success: false,
+                message: "Something went wrong while updating category status.",
+            } satisfies CategoryActionResult;
+        }
+    }
+
+    async function deleteCategoryAction(formData: FormData) {
+        "use server";
+
+        const categoryId = String(formData.get("categoryId") || "").trim();
+
+        if (!categoryId) {
+            return {
+                success: false,
+                message: "Invalid category id.",
+            } satisfies CategoryActionResult;
+        }
+
+        try {
+            const result = await deleteCategory(categoryId);
+
+            if (result?.success === false) {
+                return {
+                    success: false,
+                    message: result?.errorMessage || "Failed to delete category.",
+                } satisfies CategoryActionResult;
+            }
+
+            revalidatePath("/provider/categories");
+
+            return {
+                success: true,
+                message: result?.message || "Category deleted successfully!",
+            } satisfies CategoryActionResult;
+        } catch {
+            return {
+                success: false,
+                message: "Something went wrong while deleting category.",
+            } satisfies CategoryActionResult;
+        }
+    }
 
     return (
         <div className="space-y-6">
@@ -176,9 +256,37 @@ export default async function ProviderCategoriesPage({ searchParams }: {
                                 </div>
 
                                 <div className="mt-4 flex gap-2">
-                                    <Button variant="outline" size="sm" className="rounded-xl"><Pencil className="h-4 w-4" /> Edit</Button>
-                                    <Button variant="destructive" size="sm" className="rounded-xl"><Trash2 className="h-4 w-4" /> Delete</Button>
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button variant="outline" size="sm" className="rounded-xl flex-1"><Pencil className="h-4 w-4" /> Edit</Button>
+                                        </DialogTrigger>
+                                        <CategoryForm
+                                            cuisineOptions={cuisineOptions}
+                                            initialData={{
+                                                id: category.id,
+                                                name: category.name,
+                                                cuisineId: category.cuisineId || "",
+                                                image: category.image,
+                                            }}
+                                        />
+                                    </Dialog>
+                                    <CategoryActions
+                                        categoryId={category.id}
+                                        status={category.status === "Active" ? "ACTIVE" : category.status}
+                                        onDeleteAction={deleteCategoryAction}
+                                        onToggleStatusAction={toggleCategoryStatusAction}
+                                        showToggle={false}
+                                        containerClassName="flex-1"
+                                    />
                                 </div>
+                                <CategoryActions
+                                    categoryId={category.id}
+                                    status={category.status === "Active" ? "ACTIVE" : category.status}
+                                    onDeleteAction={deleteCategoryAction}
+                                    onToggleStatusAction={toggleCategoryStatusAction}
+                                    showDelete={false}
+                                    containerClassName="mt-2 w-full"
+                                />
                             </div>
                         </article>
                     ))}

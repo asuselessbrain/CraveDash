@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ComponentType } from "react";
-import { Building2, MapPin, ShoppingBag, Users } from "lucide-react";
+import { LayoutGrid, MapPin, ShoppingBag, Store, UtensilsCrossed } from "lucide-react";
 
 type Stat = {
 	label: string;
@@ -12,10 +12,24 @@ type Stat = {
 
 const fallbackStats: Stat[] = [
 	{ label: "Total Orders Delivered", value: 50000, suffix: "+", icon: ShoppingBag },
-	{ label: "Active Restaurants", value: 500, suffix: "+", icon: Building2 },
-	{ label: "Happy Customers", value: 25000, suffix: "+", icon: Users },
-	{ label: "Cities Covered", value: 15, suffix: "+", icon: MapPin },
+	{ label: "Active Restaurants", value: 500, suffix: "+", icon: Store },
+	{ label: "Cuisine Types", value: 25, suffix: "+", icon: UtensilsCrossed },
+	{ label: "Food Categories", value: 15, suffix: "+", icon: LayoutGrid },
 ];
+
+const defaultIcons: Array<ComponentType<{ className?: string }>> = [ShoppingBag, UtensilsCrossed, LayoutGrid, Store];
+
+function resolveStatIcon(label: string, index: number) {
+	const normalizedLabel = label.toLowerCase();
+
+	if (normalizedLabel.includes("meal") || normalizedLabel.includes("order")) return ShoppingBag;
+	if (normalizedLabel.includes("cuisine")) return UtensilsCrossed;
+	if (normalizedLabel.includes("categor")) return LayoutGrid;
+	if (normalizedLabel.includes("provider") || normalizedLabel.includes("restaurant")) return Store;
+	if (normalizedLabel.includes("cities") || normalizedLabel.includes("city") || normalizedLabel.includes("location")) return MapPin;
+
+	return defaultIcons[index % defaultIcons.length];
+}
 
 function formatCount(value: number) {
 	return value.toLocaleString("en-US");
@@ -25,10 +39,9 @@ export default function LiveOrderStats({ items }: { items?: Stat[] }) {
 	const stats = (items?.length ? items : fallbackStats).map((item, index) => {
 		if (item.icon) return item;
 
-		const icons: Array<ComponentType<{ className?: string }>> = [ShoppingBag, Building2, Users, MapPin];
 		return {
 			...item,
-			icon: icons[index % icons.length],
+			icon: resolveStatIcon(item.label, index),
 		};
 	});
 	const sectionRef = useRef<HTMLElement | null>(null);

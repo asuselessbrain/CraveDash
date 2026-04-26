@@ -1,0 +1,14 @@
+<svg width="228" height="56" viewBox="0 0 228 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cd_grad" x1="6" y1="6" x2="50" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FB923C"/>
+      <stop offset="1" stop-color="#F97316"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="52" height="52" rx="14" fill="#0F172A"/>
+  <rect x="4" y="4" width="48" height="48" rx="12" stroke="#FDBA74" stroke-opacity="0.45" stroke-width="1.5"/>
+  <path d="M15 17.5H40.5L36.5 22.8H22.3L20.6 25.2H34.8L31 30.2H17.1L15 33.1H37.6L33.5 38.5H8.5L15 29.5L11 29.5L15.4 23.6H19.2L23.3 17.5H15Z" fill="url(#cd_grad)"/>
+  <circle cx="34.5" cy="35.8" r="2.8" fill="#FDBA74"/>
+  <text x="66" y="35" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="26" font-weight="800" fill="#E2E8F0">Crave</text>
+  <text x="151" y="35" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="26" font-weight="800" fill="#F97316">Dash</text>
+</svg>

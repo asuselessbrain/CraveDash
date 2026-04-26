@@ -132,6 +132,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  a {
+    cursor: pointer;
+  }
   img,
   video,
   canvas,

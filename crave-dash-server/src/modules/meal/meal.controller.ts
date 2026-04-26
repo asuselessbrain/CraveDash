@@ -15,9 +15,9 @@ const createMeal = catchAsync(async (req: Request & { user?: { email: string } }
     })
 })
 
-const getProvidersMeals = catchAsync(async (req: Request, res: Response) => {
-    
-    const result = await MealService.getProvidersMeals(req.query);
+const getProvidersMeals = catchAsync(async (req: Request & { user?: { email: string } }, res: Response) => {
+    const providerEmail = req.user?.email as string;
+    const result = await MealService.getProvidersMeals(providerEmail, req.query);
 
     res.status(200).json({
         success: true,
@@ -48,9 +48,11 @@ const getMealById = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-const updateMeal = catchAsync(async (req: Request, res: Response) => {
+const updateMeal = catchAsync(async (req: Request & { user?: { email: string; role: string } }, res: Response) => {
     const mealId = req.params.id as string;
-    const result = await MealService.updateMeal(mealId, req.body);
+    const email = req.user?.email as string;
+    const role = req.user?.role as string;
+    const result = await MealService.updateMealWithAuth(mealId, email, role, req.body);
 
     res.status(200).json({
         success: true,
@@ -59,9 +61,11 @@ const updateMeal = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-const deleteMeal = catchAsync(async (req: Request, res: Response) => {
+const deleteMeal = catchAsync(async (req: Request & { user?: { email: string; role: string } }, res: Response) => {
     const mealId = req.params.id as string;
-    const result = await MealService.deleteMeal(mealId);
+    const email = req.user?.email as string;
+    const role = req.user?.role as string;
+    const result = await MealService.deleteMealWithAuth(mealId, email, role);
 
     res.status(200).json({
         success: true,
@@ -70,6 +74,18 @@ const deleteMeal = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const toggleMealAvailability = catchAsync(async (req: Request & { user?: { email: string; role: string } }, res: Response) => {
+    const mealId = req.params.id as string;
+    const email = req.user?.email as string;
+    const role = req.user?.role as string;
+    const result = await MealService.toggleAvailability(mealId, email, role);
+
+    res.status(200).json({
+        success: true,
+        message: "Meal availability toggled successfully",
+        data: result,
+    });
+});
 export const MealController = {
     createMeal,
     getProvidersMeals,
@@ -77,4 +93,5 @@ export const MealController = {
     updateMeal,
     deleteMeal,
     getMeals,
+    toggleMealAvailability,
 }

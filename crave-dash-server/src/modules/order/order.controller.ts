@@ -20,6 +20,27 @@ const createOrder = catchAsync(async (req: AuthenticatedRequest, res: Response) 
   });
 });
 
+const createStripeCheckoutSession = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
+  const result = await OrderService.createStripeCheckoutSession(req.body, req.user.email);
+
+  res.status(200).json({
+    success: true,
+    message: "Stripe checkout session created successfully",
+    data: result,
+  });
+});
+
+const confirmStripeCheckoutSession = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
+  const sessionId = req.body?.sessionId as string;
+  const result = await OrderService.confirmStripeCheckoutSession(sessionId, req.user.email);
+
+  res.status(200).json({
+    success: true,
+    message: "Stripe payment confirmed successfully",
+    data: result,
+  });
+});
+
 const getMyOrders = catchAsync(async (req: AuthenticatedRequest, res: Response) => {
   const result = await OrderService.getMyOrders(req.user.email, req.query);
 
@@ -90,6 +111,8 @@ const updateProviderOrderStatus = catchAsync(async (req: AuthenticatedRequest, r
 
 export const OrderController = {
   createOrder,
+  createStripeCheckoutSession,
+  confirmStripeCheckoutSession,
   getMyOrders,
   getProvidersOrders,
   getAdminOrders,

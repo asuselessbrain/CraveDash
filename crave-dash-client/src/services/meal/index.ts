@@ -56,7 +56,14 @@ export const deleteMeal = async (mealId: string) => {
 };
 
 export const updateMeal = async (mealId: string, data: MealPayload) => {
-    const result = await baseApi(`meal/${mealId}`, "PUT", data, undefined, "meals");
+    const result = await baseApi(`meal/${mealId}`, "PATCH", data, undefined, "meals");
+    revalidateTag("meals", "max");
+    return result;
+};
+
+export const toggleMealAvailability = async (mealId: string) => {
+    const result = await baseApi(`meal/${mealId}/toggle-availability`, "PATCH", undefined, undefined, "meals");
+    revalidateTag("meals", "max");
     return result;
 };
 

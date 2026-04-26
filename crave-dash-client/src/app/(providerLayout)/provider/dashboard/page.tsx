@@ -139,7 +139,7 @@ export default async function ProviderDashboardPage() {
                                     const itemCount = order.itemCount ?? order.quantity ?? 0;
                                     const itemCountLabel = order.itemCountLabel ?? `${itemCount} ${itemCount === 1 ? "item" : "items"}`;
                                     const status = order.statusLabel ?? order.orderStatus ?? order.status ?? "Pending";
-                                    const totalAmount = order.formattedTotal ?? `$${formatAmount(order.total ?? order.amount ?? order.grandTotal)}`;
+                                    const totalAmount = order.formattedTotal ?? `৳${formatAmount(order.total ?? order.amount ?? order.grandTotal)}`;
 
                                     return (
                                         <tr key={order.id ?? order.orderId ?? orderId} className="text-sm hover:bg-slate-50 dark:hover:bg-slate-950/70">

@@ -6,6 +6,7 @@ model Order {
   
   // Items relation
   items              OrderItem[]
+  reviews            Review[]
   
   // Delivery Address relation
   deliveryAddress    DeliveryAddress?
