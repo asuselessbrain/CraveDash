@@ -2,12 +2,13 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { BadgeCheck, CalendarDays, CheckCircle2, CircleDot, Clock3, MapPin, Truck } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import LeaveReviewDialog from "@/components/modules/customer/LeaveReviewDialog";
 import { getCustomerOrderById } from "@/services/order";
 
 type CustomerOrderStatus = "Delivered" | "On the way" | "Preparing" | "Confirmed" | "Pending" | "Cancelled";
 
 type RawOrderItem = {
+  mealId?: string;
   name?: string;
   title?: string;
   mealName?: string;
@@ -17,6 +18,7 @@ type RawOrderItem = {
   totalPrice?: number | string;
   quantity?: number;
   meal?: {
+    id?: string;
     name?: string;
     title?: string;
     image?: string;
@@ -66,6 +68,7 @@ type OrderDetailsApiResponse = {
 };
 
 type UiOrderItem = {
+  mealId: string;
   name: string;
   image: string;
   quantity: number;
@@ -216,8 +219,10 @@ function toOrderItems(rawOrder: RawOrder): UiOrderItem[] {
     const quantity = Math.max(1, toNumber(item.quantity, 1));
     const unitPrice = toNumber(item.unitPrice ?? item.price ?? item.meal?.price, 0);
     const lineTotal = toNumber(item.totalPrice, unitPrice * quantity);
+    const mealId = item.mealId || item.meal?.id;
 
     return {
+      mealId: mealId || `missing-meal-id-${index + 1}`,
       name: item.meal?.name || item.meal?.title || item.mealName || item.name || item.title || `Item ${index + 1}`,
       image: item.meal?.image || item.image || "/categories/pizza.svg",
       quantity,
@@ -379,7 +384,15 @@ export default async function CustomerOrderDetailsPage({ params }: { params: Pro
             <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm dark:border-emerald-500/20 dark:bg-emerald-500/10">
               <h2 className="text-lg font-extrabold text-emerald-800 dark:text-emerald-200">Your order has been delivered</h2>
               <p className="mt-2 text-sm text-emerald-700/90 dark:text-emerald-200/80">Leave a review to help others and share your experience.</p>
-              <Button className="mt-5 h-11 w-full rounded-xl bg-orange-500 text-white hover:bg-orange-400">Leave Review</Button>
+              <LeaveReviewDialog
+                orderId={order.id}
+                items={order.items
+                  .filter((item) => !item.mealId.startsWith("missing-meal-id-"))
+                  .map((item) => ({
+                    mealId: item.mealId,
+                    mealName: item.name,
+                  }))}
+              />
             </div>
           )}
         </aside>
